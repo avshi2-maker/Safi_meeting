@@ -1,9 +1,18 @@
-// types.ts (src/lib/types.ts) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// types.ts (src/lib/types.ts) · updated 07.08.2026 18:40 (Asia/Jerusalem)
 
 export type SlotKey = "morning" | "noon" | "afternoon" | "evening";
 
-// availability: { "2026-09-04": ["evening","noon"], ... }
-export type Availability = Record<string, SlotKey[]>;
+// Per-date selection: chosen slots, when it was picked, and an optional remark.
+export interface DaySelection {
+  slots: SlotKey[];
+  pickedAt: string; // ISO timestamp of the click
+  remark?: string;
+}
+
+// availability: { "2026-09-04": { slots:["evening"], pickedAt:"...", remark:"אחרי 19:00" } }
+// Legacy rows may still be Record<string, SlotKey[]> — normalized on read.
+export type Availability = Record<string, DaySelection>;
+export type RawAvailability = Record<string, SlotKey[] | DaySelection>;
 
 export interface Participant {
   id: string;
@@ -23,6 +32,11 @@ export interface ResponseWithName extends ResponseRow {
   name: string;
 }
 
+export interface OptionRemark {
+  name: string;
+  text: string;
+}
+
 export interface SuggestionOption {
   date: string; // YYYY-MM-DD
   slot: SlotKey;
@@ -31,6 +45,7 @@ export interface SuggestionOption {
   maybe: string[];
   unavailable: string[];
   reason_he: string;
+  remarks: OptionRemark[]; // per-date remarks tied to this date
 }
 
 export interface AnalyzeResult {

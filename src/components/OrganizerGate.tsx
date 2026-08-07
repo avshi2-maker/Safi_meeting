@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { checkPassphraseAction } from "@/app/actions";
+import BackButton from "./BackButton";
 
 export default function OrganizerGate() {
   const [pass, setPass] = useState("");
@@ -21,6 +22,7 @@ export default function OrganizerGate() {
 
   return (
     <main className="wrap">
+      <BackButton />
       <div className="card gate">
         <h2>תצוגת מארגן</h2>
         <p className="subtle">הזינו את סיסמת המארגן כדי לראות את הסיכום וההצעות.</p>

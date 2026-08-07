@@ -1,5 +1,6 @@
-// responses.ts (src/lib/responses.ts) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// responses.ts (src/lib/responses.ts) · updated 07.08.2026 18:40 (Asia/Jerusalem)
 import { getServiceClient } from "./supabaseServer";
+import { normalizeAvailability } from "./availability";
 import type { Availability, ResponseRow, ResponseWithName } from "./types";
 
 export async function getResponse(
@@ -12,7 +13,8 @@ export async function getResponse(
     .eq("participant_id", participantId)
     .maybeSingle();
   if (error) throw error;
-  return (data as ResponseRow) ?? null;
+  if (!data) return null;
+  return { ...(data as ResponseRow), availability: normalizeAvailability(data.availability) };
 }
 
 export async function upsertResponse(
@@ -46,7 +48,7 @@ export async function getAllResponses(): Promise<ResponseWithName[]> {
   type Raw = ResponseRow & { safi_participants: { name: string } | null };
   return ((data ?? []) as unknown as Raw[]).map((r) => ({
     participant_id: r.participant_id,
-    availability: r.availability,
+    availability: normalizeAvailability(r.availability),
     note: r.note,
     submitted_at: r.submitted_at,
     updated_at: r.updated_at,

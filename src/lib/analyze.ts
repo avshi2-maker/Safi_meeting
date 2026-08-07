@@ -1,9 +1,10 @@
-// analyze.ts (src/lib/analyze.ts) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// analyze.ts (src/lib/analyze.ts) · updated 07.08.2026 18:40 (Asia/Jerusalem)
 import type {
   ResponseWithName,
   Participant,
   SlotKey,
   SuggestionOption,
+  OptionRemark,
 } from "./types";
 import { SLOTS, SLOT_MAP } from "./slots";
 import { fullLabelHe } from "./dates";
@@ -20,14 +21,12 @@ function keyOf(date: string, slot: SlotKey): string {
   return `${date}|${slot}`;
 }
 
-// Build every (date, slot) that at least one person picked, with the roster,
-// ranked by attendance then earliest date.
 export function computeCandidates(responses: ResponseWithName[]): Candidate[] {
   const map = new Map<string, string[]>();
   for (const r of responses) {
     const av = r.availability || {};
     for (const date of Object.keys(av)) {
-      const slots = Array.isArray(av[date]) ? av[date] : [];
+      const slots = av[date]?.slots ?? [];
       for (const slot of slots) {
         if (!VALID_SLOTS.has(slot)) continue;
         const k = keyOf(date, slot);
@@ -54,17 +53,35 @@ export function candidateMap(cands: Candidate[]): Map<string, string[]> {
   return m;
 }
 
-// Compact text of everyone's picks + notes, for the model prompt.
+// date -> [{name, text}] from per-date remarks.
+export function remarksByDate(responses: ResponseWithName[]): Map<string, OptionRemark[]> {
+  const m = new Map<string, OptionRemark[]>();
+  for (const r of responses) {
+    const av = r.availability || {};
+    for (const date of Object.keys(av)) {
+      const t = av[date]?.remark?.trim();
+      if (!t) continue;
+      const arr = m.get(date) ?? [];
+      arr.push({ name: r.name, text: t });
+      m.set(date, arr);
+    }
+  }
+  return m;
+}
+
 export function buildResponsesBlock(responses: ResponseWithName[]): string {
   const lines: string[] = [];
   for (const r of responses) {
     const av = r.availability || {};
     const parts = Object.keys(av)
       .sort()
-      .map((d) => `${d}:${(av[d] || []).join(",")}`);
+      .map((d) => {
+        const rem = av[d]?.remark?.trim();
+        return `${d}:${(av[d]?.slots || []).join(",")}${rem ? ` (הערה: ${rem})` : ""}`;
+      });
     lines.push(
       `- ${r.name}: ${parts.length ? parts.join(" | ") : "(ריק)"}${
-        r.note ? `  [הערה: ${r.note}]` : ""
+        r.note ? `  [הערה כללית: ${r.note}]` : ""
       }`,
     );
   }
@@ -81,12 +98,11 @@ export function buildCandidateBlock(cands: Candidate[], limit = 14): string {
     .join("\n");
 }
 
-// Turn the model's picks into full options, deriving the roster server-side
-// (never trusting the model for who is in/out).
 export function assembleOptions(
   picks: { date: string; slot: string; reason_he?: string; maybe?: string[] }[],
   cmap: Map<string, string[]>,
   allNames: string[],
+  remarks: Map<string, OptionRemark[]>,
 ): SuggestionOption[] {
   const out: SuggestionOption[] = [];
   for (const p of picks.slice(0, 3)) {
@@ -107,15 +123,16 @@ export function assembleOptions(
       maybe,
       unavailable,
       reason_he: p.reason_he?.trim() || "",
+      remarks: remarks.get(p.date) ?? [],
     });
   }
   return out;
 }
 
-// Deterministic top-3 if the model call fails.
 export function fallbackOptions(
   cands: Candidate[],
   allNames: string[],
+  remarks: Map<string, OptionRemark[]>,
 ): SuggestionOption[] {
   return cands.slice(0, 3).map((c) => ({
     date: c.date,
@@ -125,6 +142,7 @@ export function fallbackOptions(
     maybe: [],
     unavailable: allNames.filter((n) => !c.available.includes(n)),
     reason_he: `${c.available.length} מתוך ${allNames.length} זמינים במועד זה.`,
+    remarks: remarks.get(c.date) ?? [],
   }));
 }
 
@@ -132,9 +150,10 @@ export function buildSystemPrompt(): string {
   return [
     "אתה עוזר לתאם מפגש משפחתי אחד בין כל המשתתפים, בין 1.9.2026 ל-30.11.2026.",
     "מטרתך: לבחור עד 3 מועדים (תאריך + חלק-יום) שממקסמים את מספר המשתתפים הזמינים.",
-    "בחר אך ורק מתוך רשימת המועדים המועמדים שסופקה. שים לב להערות (למשל מי בחו״ל).",
+    "בחר אך ורק מתוך רשימת המועדים המועמדים שסופקה.",
+    "התחשב בהערות לכל תאריך ובהערות הכלליות (למשל 'רק בערב', 'בחו״ל', 'אחרי 19:00').",
     "החזר JSON תקין בלבד, ללא טקסט נוסף וללא סימוני קוד, במבנה:",
-    '{"options":[{"date":"YYYY-MM-DD","slot":"morning|noon|afternoon|evening","reason_he":"משפט אחד בעברית","maybe":["שם"]}]}',
+    '{"options":[{"date":"YYYY-MM-DD","slot":"morning|noon|afternoon|evening","reason_he":"משפט אחד בעברית שמתייחס גם להערות הרלוונטיות","maybe":["שם"]}]}',
     "השדה maybe אופציונלי — רק אם הערה יוצרת אי-ודאות לגבי מישהו.",
   ].join("\n");
 }
@@ -149,12 +168,12 @@ export function buildUserPrompt(
     `סה״כ ${participants.length} משתתפים: ${names}.`,
     `נענו ${responses.length}.`,
     "",
-    "זמינות שהוגשה:",
+    "זמינות והערות שהוגשו:",
     buildResponsesBlock(responses),
     "",
     "מועדים מועמדים (ממויינים לפי מספר זמינים):",
     buildCandidateBlock(cands),
     "",
-    "בחר את 3 המועדים הטובים ביותר והחזר JSON כפי שהוגדר.",
+    "בחר את 3 המועדים הטובים ביותר, תוך התחשבות בהערות, והחזר JSON כפי שהוגדר.",
   ].join("\n");
 }

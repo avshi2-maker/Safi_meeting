@@ -9,6 +9,7 @@ import HeatmapCalendar from "./HeatmapCalendar";
 import SuggestionCard from "./SuggestionCard";
 import ExportBar from "./ExportBar";
 import ApiCostMeter, { MeterState } from "./ApiCostMeter";
+import BackButton from "./BackButton";
 
 interface RespItem {
   participant_id: string;
@@ -40,7 +41,7 @@ export default function OrganizerDashboard({ participants, responses, latest }: 
     const c: Record<string, number> = {};
     for (const r of responses) {
       for (const date of Object.keys(r.availability || {})) {
-        if ((r.availability[date] || []).length > 0) c[date] = (c[date] ?? 0) + 1;
+        if ((r.availability[date]?.slots || []).length > 0) c[date] = (c[date] ?? 0) + 1;
       }
     }
     return c;
@@ -93,6 +94,7 @@ export default function OrganizerDashboard({ participants, responses, latest }: 
 
   return (
     <main className="wrap">
+      <BackButton />
       <div className="hero">
         <div className="kick">תצוגת מארגן</div>
         <h1>סיכום ותיאום</h1>

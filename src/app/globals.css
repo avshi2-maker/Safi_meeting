@@ -148,3 +148,34 @@ textarea.input { resize: vertical; min-height: 64px; }
   .exportbar { grid-template-columns: repeat(3, 1fr); }
   .namegrid { grid-template-columns: 1fr; }
 }
+
+/* --- v2 additions: bg photo, clock, back bar, per-date cards, remarks --- */
+.backbar { margin-bottom: 8px; }
+.has-bg { position: relative; }
+.bg-photo {
+  position: fixed; inset: 0; z-index: -2;
+  background: url('/safi_backround.png') center 12% / cover no-repeat;
+}
+.bg-scrim {
+  position: fixed; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, rgba(253,246,236,0.50) 0%, rgba(249,238,226,0.80) 42%, rgba(246,231,214,0.92) 100%);
+}
+.clock { text-align: center; margin: 2px 0 10px; }
+.clock-time {
+  display: block; font-size: 34px; font-weight: 800; letter-spacing: 2px;
+  color: var(--ink); font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 10px rgba(255,255,255,0.7);
+}
+.clock-date { display: block; font-size: 13px; color: var(--muted); font-weight: 600; }
+.card.glass { background: rgba(255,253,249,0.93); backdrop-filter: blur(4px); }
+
+.daycard { border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; background: #fff; }
+.dayhead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.dayhead .d { font-weight: 700; }
+.picked-at { font-size: 11px; color: var(--muted); background: #f3ede8; padding: 2px 8px; border-radius: 999px; }
+.dayhead .chip.x { margin-inline-start: auto; }
+.day-remark { margin-top: 8px; font-size: 14px; }
+
+.remarks { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.remarks-h { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
+.remark-line { font-size: 13px; margin-bottom: 2px; }

@@ -1,4 +1,4 @@
-// exportFormats.ts (src/lib/exportFormats.ts) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// exportFormats.ts (src/lib/exportFormats.ts) · updated 07.08.2026 18:40 (Asia/Jerusalem)
 import type { SuggestionOption } from "./types";
 
 export function buildShareText(
@@ -16,6 +16,7 @@ export function buildShareText(
     if (o.maybe.length) lines.push(`   ❔ אולי: ${o.maybe.join(", ")}`);
     if (o.unavailable.length) lines.push(`   ❌ לא יכולים: ${o.unavailable.join(", ")}`);
     if (o.reason_he) lines.push(`   💬 ${o.reason_he}`);
+    o.remarks.forEach((r) => lines.push(`   📝 ${r.name}: ${r.text}`));
     lines.push("");
   });
   lines.push("מה הכי מתאים לכם? תגיבו כאן 🙏");

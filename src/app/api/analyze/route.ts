@@ -1,4 +1,4 @@
-// route.ts (src/app/api/analyze/route.ts) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// route.ts (src/app/api/analyze/route.ts) · updated 07.08.2026 18:40 (Asia/Jerusalem)
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import Anthropic from "@anthropic-ai/sdk";
@@ -7,6 +7,7 @@ import { getAllResponses } from "@/lib/responses";
 import {
   computeCandidates,
   candidateMap,
+  remarksByDate,
   assembleOptions,
   fallbackOptions,
   buildSystemPrompt,
@@ -49,6 +50,8 @@ export async function POST() {
   const responded = responses.length;
 
   const cands = computeCandidates(responses);
+  const remarks = remarksByDate(responses);
+
   if (cands.length === 0) {
     const empty: AnalyzeResult = {
       options: [],
@@ -64,7 +67,7 @@ export async function POST() {
   const cmap = candidateMap(cands);
   let inputTokens = 0;
   let outputTokens = 0;
-  let options = fallbackOptions(cands, allNames);
+  let options = fallbackOptions(cands, allNames, remarks);
 
   try {
     const client = new Anthropic();
@@ -82,11 +85,7 @@ export async function POST() {
     const text = textBlock && "text" in textBlock ? textBlock.text : "";
     const parsed = extractJson(text);
     if (parsed && Array.isArray(parsed.options)) {
-      const assembled = assembleOptions(
-        parsed.options as never,
-        cmap,
-        allNames,
-      );
+      const assembled = assembleOptions(parsed.options as never, cmap, allNames, remarks);
       if (assembled.length) options = assembled;
     }
   } catch {

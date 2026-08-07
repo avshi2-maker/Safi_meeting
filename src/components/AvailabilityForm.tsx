@@ -1,14 +1,19 @@
 "use client";
-// AvailabilityForm.tsx (src/components/AvailabilityForm.tsx) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// AvailabilityForm.tsx (src/components/AvailabilityForm.tsx) · updated 07.08.2026 18:40 (Asia/Jerusalem)
 import { useMemo, useState, useTransition } from "react";
-import Link from "next/link";
 import { SLOTS } from "@/lib/slots";
 import { WINDOW_MONTHS, shortLabelHe } from "@/lib/dates";
 import { saveAvailabilityAction } from "@/app/actions";
 import type { Availability, SlotKey } from "@/lib/types";
 import MonthCalendar from "./MonthCalendar";
+import BackButton from "./BackButton";
 
 const ALL_SLOTS: SlotKey[] = SLOTS.map((s) => s.key);
+
+function hm(iso: string): string {
+  if (!iso) return "";
+  return new Date(iso).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+}
 
 interface Props {
   participant: { id: string; name: string };
@@ -30,7 +35,7 @@ export default function AvailabilityForm({ participant, existing }: Props) {
     setAv((prev) => {
       const next = { ...prev };
       if (next[date]) delete next[date];
-      else next[date] = [...ALL_SLOTS];
+      else next[date] = { slots: [...ALL_SLOTS], pickedAt: new Date().toISOString() };
       return next;
     });
   }
@@ -38,13 +43,22 @@ export default function AvailabilityForm({ participant, existing }: Props) {
   function toggleSlot(date: string, slot: SlotKey) {
     setSaved(false);
     setAv((prev) => {
-      const cur = prev[date] ?? [];
-      const has = cur.includes(slot);
-      const nextSlots = has ? cur.filter((s) => s !== slot) : [...cur, slot];
+      const cur = prev[date] ?? { slots: [], pickedAt: new Date().toISOString() };
+      const has = cur.slots.includes(slot);
+      const nextSlots = has ? cur.slots.filter((s) => s !== slot) : [...cur.slots, slot];
       const next = { ...prev };
       if (nextSlots.length === 0) delete next[date];
-      else next[date] = nextSlots;
+      else next[date] = { ...cur, slots: nextSlots };
       return next;
+    });
+  }
+
+  function setRemark(date: string, text: string) {
+    setSaved(false);
+    setAv((prev) => {
+      const cur = prev[date];
+      if (!cur) return prev;
+      return { ...prev, [date]: { ...cur, remark: text } };
     });
   }
 
@@ -61,12 +75,11 @@ export default function AvailabilityForm({ participant, existing }: Props) {
 
   return (
     <main className="wrap">
+      <BackButton />
       <div className="hero">
         <div className="kick">שלום {participant.name} 👋</div>
         <h1>מתי נוח לכם להיפגש?</h1>
-        <p className="subtle">
-          לחצו על התאריכים שמתאימים (נבחרים כיום שלם — אפשר לצמצם לחלקי-יום למטה).
-        </p>
+        <p className="subtle">לחצו על תאריכים (נבחרים כיום שלם — אפשר לצמצם לחלקי-יום ולהוסיף הערה לכל תאריך).</p>
       </div>
 
       <div className="card">
@@ -79,28 +92,33 @@ export default function AvailabilityForm({ participant, existing }: Props) {
 
       {totalPicked > 0 && (
         <div className="card">
-          <h2>שעות מועדפות ({totalPicked} תאריכים)</h2>
-          <div className="slots-picked">
-            {sortedDates.map((date) => (
-              <div key={date} className="slotrow">
-                <div className="d">{shortLabelHe(date)}</div>
+          <h2>פירוט לכל תאריך ({totalPicked})</h2>
+          {sortedDates.map((date) => (
+            <div key={date} className="daycard">
+              <div className="dayhead">
+                <span className="d">{shortLabelHe(date)}</span>
+                {av[date].pickedAt && <span className="picked-at">נבחר {hm(av[date].pickedAt)}</span>}
+                <button className="chip x" onClick={() => toggleDate(date)}>מחיקה ✕</button>
+              </div>
+              <div className="row" style={{ gap: 6 }}>
                 {SLOTS.map((s) => {
-                  const on = (av[date] ?? []).includes(s.key);
+                  const on = (av[date].slots ?? []).includes(s.key);
                   const cls = "chip" + (on ? " on" : "");
                   return (
                     <button key={s.key} className={cls} onClick={() => toggleSlot(date, s.key)}>{s.he}</button>
                   );
                 })}
-                <button className="chip x" onClick={() => toggleDate(date)}>הסר ✕</button>
               </div>
-            ))}
-          </div>
+              <input className="input day-remark" value={av[date].remark ?? ""} placeholder="הערה לתאריך זה (לא חובה) — לדוגמה: רק אחרי 19:00"
+                onChange={(e) => setRemark(date, e.target.value)} />
+            </div>
+          ))}
         </div>
       )}
 
       <div className="card">
-        <h3>הערה (לא חובה)</h3>
-        <textarea className="input" value={note} placeholder="לדוגמה: בחו״ל 10–20/10, אחרי 19:00 עדיף…"
+        <h3>הערה כללית (לא חובה)</h3>
+        <textarea className="input" value={note} placeholder="לדוגמה: בחו״ל 10–20/10, כל ערב מלבד שלישי…"
           onChange={(e) => { setNote(e.target.value); setSaved(false); }} />
       </div>
 
@@ -111,7 +129,6 @@ export default function AvailabilityForm({ participant, existing }: Props) {
         </button>
       </div>
       {saved && <p className="saved" style={{ textAlign: "center" }}>אפשר לחזור ולעדכן בכל שלב.</p>}
-      <div className="foot"><Link href="/" className="btn btn-ghost">→ חזרה</Link></div>
     </main>
   );
 }
