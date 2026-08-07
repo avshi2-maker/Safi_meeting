@@ -256,3 +256,45 @@ textarea.input { resize: vertical; min-height: 64px; }
   .btn { padding: 12px 16px; }
   .cal-cell, .heat-cell { font-size: 13px; }
 }
+
+/* --- v5: sticky save action card, embossed pulsing button, mobile save bar --- */
+.live { max-height: 44vh; overflow-y: auto; }
+.save-card { text-align: center; }
+.save-hero img { width: 100%; max-width: 340px; border-radius: 12px; display: block; margin: 0 auto 12px; box-shadow: var(--shadow); }
+
+.btn-save {
+  width: 100%; font-family: inherit; font-size: 18px; font-weight: 800; color: #fff;
+  padding: 16px 20px; border: none; border-radius: 14px; cursor: pointer;
+  background: linear-gradient(180deg, #ef8b70 0%, var(--accent-d) 100%);
+  box-shadow: 0 6px 0 #a84e37, 0 12px 22px rgba(200, 95, 69, 0.32);
+  transition: transform .08s, box-shadow .08s; transform: translateY(0);
+}
+.btn-save:hover { filter: brightness(1.03); }
+.btn-save:active { transform: translateY(4px); box-shadow: 0 2px 0 #a84e37, 0 5px 12px rgba(200, 95, 69, 0.3); }
+.btn-save:disabled { opacity: .55; cursor: default; box-shadow: 0 4px 0 #b0b0b0; background: linear-gradient(180deg,#cfcfcf,#a9a9a9); }
+.btn-save.saved { background: linear-gradient(180deg, #7cc59f 0%, var(--green-d) 100%); box-shadow: 0 6px 0 #3f7f60, 0 12px 22px rgba(79,143,112,.32); }
+.btn-save.attn { animation: save-attn 1.4s ease-in-out infinite; }
+@keyframes save-attn {
+  0%, 100% { box-shadow: 0 6px 0 #a84e37, 0 12px 22px rgba(200,95,69,.32); transform: translateY(0); }
+  50% { box-shadow: 0 6px 0 #a84e37, 0 0 0 6px rgba(224,122,95,.22), 0 14px 28px rgba(200,95,69,.5); transform: translateY(-2px); }
+}
+.save-nudge { color: var(--accent-d); font-weight: 700; font-size: 13px; margin: 8px 0 0; }
+
+/* desktop shows the sticky side card; mobile shows a fixed bottom bar */
+.mobile-save { display: none; }
+.desk-save { display: block; }
+@media (max-width: 899px) {
+  .desk-save { display: none; }
+  .respond-side { position: static; }
+  .live { max-height: none; }
+  .mobile-save {
+    display: flex; align-items: center; gap: 10px; justify-content: center;
+    position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(255,253,249,0.96); border-top: 1px solid var(--line);
+    box-shadow: 0 -6px 20px rgba(93,64,45,.12); backdrop-filter: blur(6px);
+  }
+  .mobile-save .btn-save { max-width: 520px; }
+  .respond-wrap { padding-bottom: 96px; } /* room for the fixed bar */
+}
+@media print { .mobile-save, .save-hero { display: none !important; } }

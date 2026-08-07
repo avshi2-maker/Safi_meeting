@@ -1,5 +1,5 @@
 "use client";
-// AvailabilityForm.tsx (src/components/AvailabilityForm.tsx) · updated 07.08.2026 19:30 (Asia/Jerusalem)
+// AvailabilityForm.tsx (src/components/AvailabilityForm.tsx) · updated 07.08.2026 20:55 (Asia/Jerusalem)
 import { useMemo, useState, useTransition } from "react";
 import { SLOTS } from "@/lib/slots";
 import { WINDOW_MONTHS, shortLabelHe } from "@/lib/dates";
@@ -32,6 +32,7 @@ export default function AvailabilityForm({ participant, existing }: Props) {
 
   const selected = useMemo(() => new Set(Object.keys(av)), [av]);
   const sortedDates = useMemo(() => Object.keys(av).sort(), [av]);
+  const totalPicked = sortedDates.length;
 
   function toggleDate(date: string) {
     setSaved(false);
@@ -74,7 +75,10 @@ export default function AvailabilityForm({ participant, existing }: Props) {
     });
   }
 
-  const totalPicked = sortedDates.length;
+  const dirty = totalPicked > 0 && !saved;
+  const saveLabel = pending ? "שומר…" : saved ? "✓ נשמר — תודה!" : "שמירת הזמינות שלי";
+  const btnCls =
+    "btn-save" + (saved ? " saved" : "") + (dirty && !pending ? " attn" : "");
 
   return (
     <main className="wrap respond-wrap">
@@ -131,20 +135,24 @@ export default function AvailabilityForm({ participant, existing }: Props) {
             <textarea className="input" value={note} placeholder="לדוגמה: בחו״ל 10–20/10, כל ערב מלבד שלישי…"
               onChange={(e) => { setNote(e.target.value); setSaved(false); }} />
           </div>
-
-          {err && <div className="err">{err}</div>}
-          <div className="row">
-            <button className="btn btn-primary" onClick={save} disabled={pending || totalPicked === 0}>
-              {pending ? "שומר…" : saved ? "✓ נשמר — תודה!" : "שמירת הזמינות שלי"}
-            </button>
-            <button className="btn btn-ghost" onClick={() => window.print()}>🖨️ הדפסה</button>
-          </div>
-          {saved && <p className="saved" style={{ textAlign: "center" }}>אפשר לחזור ולעדכן בכל שלב.</p>}
         </div>
 
         <aside className="respond-side">
           <LiveSync selfId={participant.id} />
+
+          <div className="card save-card desk-save">
+            <div className="save-hero"><img src="/safi_4helmets.png" alt="ספי" /></div>
+            {err && <div className="err" style={{ marginBottom: 8 }}>{err}</div>}
+            <button className={btnCls} onClick={save} disabled={pending || totalPicked === 0}>{saveLabel}</button>
+            {dirty && <p className="save-nudge">יש לכם בחירות שלא נשמרו — אל תשכחו לשמור!</p>}
+            <button className="btn btn-ghost btn-block" style={{ marginTop: 10 }} onClick={() => window.print()}>🖨️ הדפסה</button>
+          </div>
         </aside>
+      </div>
+
+      <div className="mobile-save">
+        {err && <span className="err">{err}</span>}
+        <button className={btnCls} onClick={save} disabled={pending || totalPicked === 0}>{saveLabel}</button>
       </div>
     </main>
   );
