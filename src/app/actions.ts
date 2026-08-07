@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { addParticipant } from "@/lib/participants";
 import { upsertResponse } from "@/lib/responses";
-import type { Availability } from "@/lib/types";
+import type { Availability, Preferences } from "@/lib/types";
 
 const ORG_COOKIE = "safi_org";
 
@@ -26,11 +26,12 @@ export async function addPersonAction(
 export async function saveAvailabilityAction(
   participantId: string,
   availability: Availability,
+  preferences: Preferences,
   note: string,
 ): Promise<{ ok: boolean; error?: string }> {
   if (!participantId) return { ok: false, error: "חסר מזהה" };
   try {
-    await upsertResponse(participantId, availability, note);
+    await upsertResponse(participantId, availability, preferences, note);
     return { ok: true };
   } catch (e) {
     return { ok: false, error: (e as Error).message };

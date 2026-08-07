@@ -1,12 +1,14 @@
 "use client";
-// AvailabilityForm.tsx (src/components/AvailabilityForm.tsx) · updated 07.08.2026 18:40 (Asia/Jerusalem)
+// AvailabilityForm.tsx (src/components/AvailabilityForm.tsx) · updated 07.08.2026 19:30 (Asia/Jerusalem)
 import { useMemo, useState, useTransition } from "react";
 import { SLOTS } from "@/lib/slots";
 import { WINDOW_MONTHS, shortLabelHe } from "@/lib/dates";
 import { saveAvailabilityAction } from "@/app/actions";
-import type { Availability, SlotKey } from "@/lib/types";
+import type { Availability, Preferences, SlotKey } from "@/lib/types";
 import MonthCalendar from "./MonthCalendar";
 import BackButton from "./BackButton";
+import PreferencesSelector from "./PreferencesSelector";
+import LiveSync from "./LiveSync";
 
 const ALL_SLOTS: SlotKey[] = SLOTS.map((s) => s.key);
 
@@ -17,11 +19,12 @@ function hm(iso: string): string {
 
 interface Props {
   participant: { id: string; name: string };
-  existing: { availability: Availability; note: string | null } | null;
+  existing: { availability: Availability; preferences: Preferences; note: string | null } | null;
 }
 
 export default function AvailabilityForm({ participant, existing }: Props) {
   const [av, setAv] = useState<Availability>(existing?.availability ?? {});
+  const [prefs, setPrefs] = useState<Preferences>(existing?.preferences ?? { activities: [] });
   const [note, setNote] = useState(existing?.note ?? "");
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
@@ -65,7 +68,7 @@ export default function AvailabilityForm({ participant, existing }: Props) {
   function save() {
     setErr("");
     start(async () => {
-      const res = await saveAvailabilityAction(participant.id, av, note);
+      const res = await saveAvailabilityAction(participant.id, av, prefs, note);
       if (res.ok) setSaved(true);
       else setErr(res.error || "שגיאה בשמירה");
     });
@@ -74,61 +77,75 @@ export default function AvailabilityForm({ participant, existing }: Props) {
   const totalPicked = sortedDates.length;
 
   return (
-    <main className="wrap">
+    <main className="wrap respond-wrap">
       <BackButton />
       <div className="hero">
         <div className="kick">שלום {participant.name} 👋</div>
         <h1>מתי נוח לכם להיפגש?</h1>
-        <p className="subtle">לחצו על תאריכים (נבחרים כיום שלם — אפשר לצמצם לחלקי-יום ולהוסיף הערה לכל תאריך).</p>
+        <p className="subtle">לחצו על תאריכים (יום שלם — אפשר לצמצם לחלקי-יום ולהוסיף הערה לכל תאריך).</p>
       </div>
 
-      <div className="card">
-        <h2>בחירת תאריכים</h2>
-        {WINDOW_MONTHS.map((m) => (
-          <MonthCalendar key={`${m.year}-${m.month}`} year={m.year} month={m.month}
-            selected={selected} onToggle={toggleDate} />
-        ))}
-      </div>
+      <div className="respond-grid">
+        <div className="respond-main">
+          <div className="card">
+            <h2>בחירת תאריכים</h2>
+            {WINDOW_MONTHS.map((m) => (
+              <MonthCalendar key={`${m.year}-${m.month}`} year={m.year} month={m.month}
+                selected={selected} onToggle={toggleDate} />
+            ))}
+          </div>
 
-      {totalPicked > 0 && (
-        <div className="card">
-          <h2>פירוט לכל תאריך ({totalPicked})</h2>
-          {sortedDates.map((date) => (
-            <div key={date} className="daycard">
-              <div className="dayhead">
-                <span className="d">{shortLabelHe(date)}</span>
-                {av[date].pickedAt && <span className="picked-at">נבחר {hm(av[date].pickedAt)}</span>}
-                <button className="chip x" onClick={() => toggleDate(date)}>מחיקה ✕</button>
-              </div>
-              <div className="row" style={{ gap: 6 }}>
-                {SLOTS.map((s) => {
-                  const on = (av[date].slots ?? []).includes(s.key);
-                  const cls = "chip" + (on ? " on" : "");
-                  return (
-                    <button key={s.key} className={cls} onClick={() => toggleSlot(date, s.key)}>{s.he}</button>
-                  );
-                })}
-              </div>
-              <input className="input day-remark" value={av[date].remark ?? ""} placeholder="הערה לתאריך זה (לא חובה) — לדוגמה: רק אחרי 19:00"
-                onChange={(e) => setRemark(date, e.target.value)} />
+          {totalPicked > 0 && (
+            <div className="card">
+              <h2>פירוט לכל תאריך ({totalPicked})</h2>
+              {sortedDates.map((date) => (
+                <div key={date} className="daycard">
+                  <div className="dayhead">
+                    <span className="d">{shortLabelHe(date)}</span>
+                    {av[date].pickedAt && <span className="picked-at">נבחר {hm(av[date].pickedAt)}</span>}
+                    <button className="chip x" onClick={() => toggleDate(date)}>מחיקה ✕</button>
+                  </div>
+                  <div className="row" style={{ gap: 6 }}>
+                    {SLOTS.map((s) => {
+                      const on = (av[date].slots ?? []).includes(s.key);
+                      const cls = "chip" + (on ? " on" : "");
+                      return (
+                        <button key={s.key} className={cls} onClick={() => toggleSlot(date, s.key)}>{s.he}</button>
+                      );
+                    })}
+                  </div>
+                  <input className="input day-remark" value={av[date].remark ?? ""} placeholder="הערה לתאריך זה (לא חובה) — לדוגמה: רק אחרי 19:00"
+                    onChange={(e) => setRemark(date, e.target.value)} />
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          <div className="card">
+            <h3>העדפות לפעילות</h3>
+            <PreferencesSelector value={prefs} onChange={(p) => { setPrefs(p); setSaved(false); }} />
+          </div>
+
+          <div className="card">
+            <h3>הערה כללית (לא חובה)</h3>
+            <textarea className="input" value={note} placeholder="לדוגמה: בחו״ל 10–20/10, כל ערב מלבד שלישי…"
+              onChange={(e) => { setNote(e.target.value); setSaved(false); }} />
+          </div>
+
+          {err && <div className="err">{err}</div>}
+          <div className="row">
+            <button className="btn btn-primary" onClick={save} disabled={pending || totalPicked === 0}>
+              {pending ? "שומר…" : saved ? "✓ נשמר — תודה!" : "שמירת הזמינות שלי"}
+            </button>
+            <button className="btn btn-ghost" onClick={() => window.print()}>🖨️ הדפסה</button>
+          </div>
+          {saved && <p className="saved" style={{ textAlign: "center" }}>אפשר לחזור ולעדכן בכל שלב.</p>}
         </div>
-      )}
 
-      <div className="card">
-        <h3>הערה כללית (לא חובה)</h3>
-        <textarea className="input" value={note} placeholder="לדוגמה: בחו״ל 10–20/10, כל ערב מלבד שלישי…"
-          onChange={(e) => { setNote(e.target.value); setSaved(false); }} />
+        <aside className="respond-side">
+          <LiveSync selfId={participant.id} />
+        </aside>
       </div>
-
-      {err && <div className="err">{err}</div>}
-      <div className="row">
-        <button className="btn btn-primary btn-block" onClick={save} disabled={pending || totalPicked === 0}>
-          {pending ? "שומר…" : saved ? "✓ נשמר — תודה!" : "שמירת הזמינות שלי"}
-        </button>
-      </div>
-      {saved && <p className="saved" style={{ textAlign: "center" }}>אפשר לחזור ולעדכן בכל שלב.</p>}
     </main>
   );
 }

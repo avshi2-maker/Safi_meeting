@@ -18,10 +18,10 @@ export default function SuggestionCard({ option, rank, total }: Props) {
         {option.maybe.map((n) => <span key={n} className="tag maybe">❔ {n}</span>)}
         {option.unavailable.map((n) => <span key={n} className="tag no">{n}</span>)}
       </div>
-      {option.remarks.length > 0 && (
+      {(option.remarks ?? []).length > 0 && (
         <div className="remarks">
           <div className="remarks-h">הערות למועד זה</div>
-          {option.remarks.map((r, i) => (
+          {(option.remarks ?? []).map((r, i) => (
             <div key={i} className="remark-line"><b>{r.name}:</b> {r.text}</div>
           ))}
         </div>

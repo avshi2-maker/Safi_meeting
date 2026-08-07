@@ -1,4 +1,4 @@
-// suggestions.ts (src/lib/suggestions.ts) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// suggestions.ts (src/lib/suggestions.ts) · updated 07.08.2026 19:30 (Asia/Jerusalem)
 import { getServiceClient } from "./supabaseServer";
 import type { SuggestionOption } from "./types";
 
@@ -10,6 +10,19 @@ export interface StoredSuggestion {
   tokens_in: number | null;
   tokens_out: number | null;
   cost_usd: number | null;
+}
+
+function sanitizeOption(o: Partial<SuggestionOption>): SuggestionOption {
+  return {
+    date: o.date ?? "",
+    slot: (o.slot ?? "evening") as SuggestionOption["slot"],
+    label_he: o.label_he ?? "",
+    available: Array.isArray(o.available) ? o.available : [],
+    maybe: Array.isArray(o.maybe) ? o.maybe : [],
+    unavailable: Array.isArray(o.unavailable) ? o.unavailable : [],
+    reason_he: o.reason_he ?? "",
+    remarks: Array.isArray(o.remarks) ? o.remarks : [],
+  };
 }
 
 export async function insertSuggestion(s: {
@@ -33,5 +46,10 @@ export async function getLatestSuggestion(): Promise<StoredSuggestion | null> {
     .limit(1)
     .maybeSingle();
   if (error) throw error;
-  return (data as StoredSuggestion) ?? null;
+  if (!data) return null;
+  const raw = data as StoredSuggestion;
+  return {
+    ...raw,
+    options: Array.isArray(raw.options) ? raw.options.map(sanitizeOption) : [],
+  };
 }

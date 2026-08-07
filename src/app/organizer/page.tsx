@@ -1,7 +1,8 @@
-// page.tsx (src/app/organizer/page.tsx) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// page.tsx (src/app/organizer/page.tsx) · updated 07.08.2026 19:30 (Asia/Jerusalem)
 import { getParticipants } from "@/lib/participants";
 import { getAllResponses } from "@/lib/responses";
 import { getLatestSuggestion } from "@/lib/suggestions";
+import { tallyPrefs } from "@/lib/prefs";
 import { isOrganizer } from "@/app/actions";
 import OrganizerGate from "@/components/OrganizerGate";
 import OrganizerDashboard from "@/components/OrganizerDashboard";
@@ -33,6 +34,7 @@ export default async function OrganizerPage() {
         tokens_out: latest.tokens_out,
         cost_usd: latest.cost_usd,
       } : null}
+      prefs={tallyPrefs(responses)}
     />
   );
 }

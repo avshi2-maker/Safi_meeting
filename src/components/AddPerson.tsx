@@ -28,7 +28,7 @@ export default function AddPerson() {
   if (!open) {
     return (
       <div className="row" style={{ marginTop: 12 }}>
-        <button className="btn btn-ghost" onClick={() => setOpen(true)}>+ הוספת אדם</button>
+        <button className="btn btn-ghost" onClick={() => setOpen(true)}>+ הוספת משתתף</button>
       </div>
     );
   }

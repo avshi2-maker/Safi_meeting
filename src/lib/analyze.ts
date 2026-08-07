@@ -8,6 +8,7 @@ import type {
 } from "./types";
 import { SLOTS, SLOT_MAP } from "./slots";
 import { fullLabelHe } from "./dates";
+import { tallyPrefs } from "./prefs";
 
 export interface Candidate {
   date: string;
@@ -164,12 +165,17 @@ export function buildUserPrompt(
   cands: Candidate[],
 ): string {
   const names = participants.map((p) => p.name).join(", ");
+  const t = tallyPrefs(responses);
+  const prefsLine = t.counts.map((c) => `${c.he}: ${c.n}`).join(" · ");
+  const ideas = t.freeIdeas.map((f) => `${f.name}: ${f.text}`).join(" | ");
   return [
     `סה״כ ${participants.length} משתתפים: ${names}.`,
     `נענו ${responses.length}.`,
     "",
     "זמינות והערות שהוגשו:",
     buildResponsesBlock(responses),
+    "",
+    `העדפות פעילות: ${prefsLine}${ideas ? ` · רעיונות חופשיים: ${ideas}` : ""}`,
     "",
     "מועדים מועמדים (ממויינים לפי מספר זמינים):",
     buildCandidateBlock(cands),

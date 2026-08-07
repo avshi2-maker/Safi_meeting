@@ -1,4 +1,4 @@
-// page.tsx (src/app/respond/page.tsx) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// page.tsx (src/app/respond/page.tsx) · updated 07.08.2026 19:30 (Asia/Jerusalem)
 import { redirect } from "next/navigation";
 import { getParticipant } from "@/lib/participants";
 import { getResponse } from "@/lib/responses";
@@ -20,7 +20,7 @@ export default async function RespondPage({
   return (
     <AvailabilityForm
       participant={{ id: participant.id, name: participant.name }}
-      existing={existing ? { availability: existing.availability, note: existing.note } : null}
+      existing={existing ? { availability: existing.availability, preferences: existing.preferences, note: existing.note } : null}
     />
   );
 }

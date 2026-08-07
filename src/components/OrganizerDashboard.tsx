@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { logoutOrganizerAction } from "@/app/actions";
 import type { Availability, SuggestionOption } from "@/lib/types";
+import type { PrefsTally } from "@/lib/prefs";
 import ResponseTracker from "./ResponseTracker";
 import HeatmapCalendar from "./HeatmapCalendar";
 import SuggestionCard from "./SuggestionCard";
@@ -28,9 +29,10 @@ interface Props {
   participants: { id: string; name: string }[];
   responses: RespItem[];
   latest: Latest | null;
+  prefs: PrefsTally;
 }
 
-export default function OrganizerDashboard({ participants, responses, latest }: Props) {
+export default function OrganizerDashboard({ participants, responses, latest, prefs }: Props) {
   const router = useRouter();
   const total = participants.length;
   const responded = responses.length;
@@ -108,6 +110,23 @@ export default function OrganizerDashboard({ participants, responses, latest }: 
 
       <ResponseTracker participants={participants} respondedIds={respondedIds} />
       <HeatmapCalendar counts={counts} total={total} />
+
+      <div className="card">
+        <h2>העדפות המשפחה</h2>
+        <div className="pills">
+          {prefs.counts.map((c) => (
+            <span key={c.key} className="pill done">{c.he}: {c.n}</span>
+          ))}
+        </div>
+        {prefs.freeIdeas.length > 0 && (
+          <div className="remarks">
+            <div className="remarks-h">רעיונות חופשיים</div>
+            {prefs.freeIdeas.map((f, i) => (
+              <div key={i} className="remark-line"><b>{f.name}:</b> {f.text}</div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="card">
         <h2>הצעות מועד חכמות</h2>

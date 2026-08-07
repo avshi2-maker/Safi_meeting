@@ -29,7 +29,8 @@ export default async function Home() {
       </div>
 
       <div className="card glass">
-        <h2>מי אתם?</h2>
+        <h2>משפחות בן נון וביטי</h2>
+        <p className="subtle" style={{ marginTop: -2, marginBottom: 10 }}>בבקשה לבחור תאריכים למפגש בלחיצה על השם</p>
         <div className="namegrid">
           {participants.map((p) => {
             const cls = "namebtn" + (done.has(p.id) ? " done" : "");
@@ -45,7 +46,7 @@ export default async function Home() {
       </div>
 
       <div className="foot">
-        <Link href="/organizer" className="btn btn-ghost">תצוגת מארגן →</Link>
+        <Link href="/organizer" className="btn btn-ghost">תצוגת מארגן — לשימוש אבשי בלבד →</Link>
       </div>
     </main>
   );

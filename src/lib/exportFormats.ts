@@ -16,7 +16,7 @@ export function buildShareText(
     if (o.maybe.length) lines.push(`   ❔ אולי: ${o.maybe.join(", ")}`);
     if (o.unavailable.length) lines.push(`   ❌ לא יכולים: ${o.unavailable.join(", ")}`);
     if (o.reason_he) lines.push(`   💬 ${o.reason_he}`);
-    o.remarks.forEach((r) => lines.push(`   📝 ${r.name}: ${r.text}`));
+    (o.remarks ?? []).forEach((r) => lines.push(`   📝 ${r.name}: ${r.text}`));
     lines.push("");
   });
   lines.push("מה הכי מתאים לכם? תגיבו כאן 🙏");
