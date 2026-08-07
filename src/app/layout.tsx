@@ -1,10 +1,17 @@
-// layout.tsx (src/app/layout.tsx) · updated 07.08.2026 12:10 (Asia/Jerusalem)
-import type { Metadata } from "next";
+// layout.tsx (src/app/layout.tsx) · updated 07.08.2026 20:20 (Asia/Jerusalem)
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Safi · תיאום מפגש משפחתי",
   description: "בוחרים תאריכים שמתאימים לכם, וה-AI מציע את המועד הכי מסונכרן.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#3f7fbf",
 };
 
 export default function RootLayout({
@@ -16,11 +23,7 @@ export default function RootLayout({
     <html lang="he" dir="rtl">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"

@@ -1,4 +1,4 @@
-// page.tsx (src/app/page.tsx) · updated 07.08.2026 18:40 (Asia/Jerusalem)
+// page.tsx (src/app/page.tsx) · updated 07.08.2026 20:20 (Asia/Jerusalem)
 import Link from "next/link";
 import { ensureSeeded, getParticipants } from "@/lib/participants";
 import { getAllResponses } from "@/lib/responses";
@@ -16,33 +16,37 @@ export default async function Home() {
   const done = new Set(responses.map((r) => r.participant_id));
 
   return (
-    <main className="wrap has-bg">
-      <div className="bg-photo" aria-hidden="true" />
-      <div className="bg-scrim" aria-hidden="true" />
-
+    <main className="wrap home">
       <Clock />
 
       <div className="hero">
         <div className="kick">מפגש משפחתי · ספטמבר–נובמבר 2026</div>
         <h1>מתאמים תאריך שמתאים לכולם</h1>
-        <p className="subtle">בחרו את השם שלכם, סמנו מתי נוח, וה-AI יציע את המועדים הכי מסונכרנים.</p>
       </div>
 
-      <div className="card glass">
-        <h2>משפחות בן נון וביטי</h2>
-        <p className="subtle" style={{ marginTop: -2, marginBottom: 10 }}>בבקשה לבחור תאריכים למפגש בלחיצה על השם</p>
-        <div className="namegrid">
-          {participants.map((p) => {
-            const cls = "namebtn" + (done.has(p.id) ? " done" : "");
-            return (
-              <Link key={p.id} href={`/respond?p=${p.id}`} className={cls}>
-                {p.name}
-                {done.has(p.id) ? <span className="ok">✓ כבר מילא/ה</span> : <small>לחצו כדי לבחור מועדים</small>}
-              </Link>
-            );
-          })}
+      <div className="home-split">
+        <div className="home-photo">
+          <img src="/safi_backround.png" alt="ספי" />
         </div>
-        <AddPerson />
+
+        <div className="home-content">
+          <div className="card">
+            <h2>משפחות בן נון וביטי</h2>
+            <p className="subtle" style={{ marginTop: -2, marginBottom: 12 }}>בבקשה לבחור תאריכים למפגש בלחיצה על השם</p>
+            <div className="namegrid">
+              {participants.map((p) => {
+                const cls = "namebtn" + (done.has(p.id) ? " done" : "");
+                return (
+                  <Link key={p.id} href={`/respond?p=${p.id}`} className={cls}>
+                    {p.name}
+                    {done.has(p.id) ? <span className="ok">✓ כבר מילא/ה</span> : <small>לחצו כדי לבחור מועדים</small>}
+                  </Link>
+                );
+              })}
+            </div>
+            <AddPerson />
+          </div>
+        </div>
       </div>
 
       <div className="foot">
