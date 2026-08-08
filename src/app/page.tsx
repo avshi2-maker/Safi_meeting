@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { ensureSeeded, getParticipants } from "@/lib/participants";
 import { getAllResponses } from "@/lib/responses";
+import { getRound } from "@/lib/round";
 import AddPerson from "@/components/AddPerson";
 import Clock from "@/components/Clock";
 
@@ -9,15 +10,27 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   await ensureSeeded();
-  const [participants, responses] = await Promise.all([
+  const [participants, responses, round] = await Promise.all([
     getParticipants(),
     getAllResponses(),
+    getRound(),
   ]);
   const done = new Set(responses.map((r) => r.participant_id));
 
   return (
     <main className="wrap home">
       <Clock />
+
+      {round.status === "open" && (
+        <Link href="/confirm" className="round-banner open">
+          🗳️ נפתח סבב אישור — לחצו לאישור המועד שמתאים לכם
+        </Link>
+      )}
+      {round.status === "locked" && round.final && (
+        <Link href="/confirm" className="round-banner locked">
+          🎉 נקבע! {round.final.label_he} — לחצו לפרטים
+        </Link>
+      )}
 
       <div className="hero">
         <div className="kick">מפגש משפחתי · ספטמבר–נובמבר 2026</div>

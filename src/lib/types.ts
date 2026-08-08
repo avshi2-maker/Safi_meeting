@@ -1,4 +1,4 @@
-// types.ts (src/lib/types.ts) · updated 07.08.2026 19:30 (Asia/Jerusalem)
+// types.ts (src/lib/types.ts) · updated 08.08.2026 08:30 (Asia/Jerusalem)
 
 export type SlotKey = "morning" | "noon" | "afternoon" | "evening";
 
@@ -12,7 +12,7 @@ export type Availability = Record<string, DaySelection>;
 export type RawAvailability = Record<string, SlotKey[] | DaySelection>;
 
 export interface Preferences {
-  activities: string[]; // activity keys
+  activities: string[];
   freeIdea?: string;
 }
 
@@ -26,6 +26,7 @@ export interface ResponseRow {
   participant_id: string;
   availability: Availability;
   preferences: Preferences;
+  confirmations: string[]; // finalist option keys "YYYY-MM-DD|slot"
   note: string | null;
   submitted_at: string;
   updated_at: string;
@@ -58,4 +59,20 @@ export interface AnalyzeResult {
   cost_usd: number;
   responded: number;
   total: number;
+}
+
+// --- confirmation round ---
+export interface Finalist {
+  date: string;
+  slot: SlotKey;
+  label_he: string;
+}
+
+export type RoundStatus = "idle" | "open" | "locked";
+
+export interface Round {
+  finalists: Finalist[];
+  status: RoundStatus;
+  final: Finalist | null;
+  announcement: string | null;
 }

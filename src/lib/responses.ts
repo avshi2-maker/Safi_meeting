@@ -1,14 +1,18 @@
-// responses.ts (src/lib/responses.ts) · updated 07.08.2026 19:30 (Asia/Jerusalem)
+// responses.ts (src/lib/responses.ts) · updated 08.08.2026 08:30 (Asia/Jerusalem)
 import { getServiceClient } from "./supabaseServer";
 import { normalizeAvailability } from "./availability";
 import { normalizePrefs } from "./prefs";
 import type { Availability, Preferences, ResponseRow, ResponseWithName } from "./types";
 
+function normConfirmations(raw: unknown): string[] {
+  return Array.isArray(raw) ? raw.filter((k) => typeof k === "string") : [];
+}
+
 export async function getResponse(participantId: string): Promise<ResponseRow | null> {
   const sb = getServiceClient();
   const { data, error } = await sb
     .from("safi_responses")
-    .select("participant_id, availability, preferences, note, submitted_at, updated_at")
+    .select("participant_id, availability, preferences, confirmations, note, submitted_at, updated_at")
     .eq("participant_id", participantId)
     .maybeSingle();
   if (error) throw error;
@@ -17,6 +21,7 @@ export async function getResponse(participantId: string): Promise<ResponseRow | 
     ...(data as ResponseRow),
     availability: normalizeAvailability(data.availability),
     preferences: normalizePrefs(data.preferences),
+    confirmations: normConfirmations(data.confirmations),
   };
 }
 
@@ -42,12 +47,20 @@ export async function upsertResponse(
   if (error) throw error;
 }
 
+export async function upsertConfirmations(participantId: string, keys: string[]): Promise<void> {
+  const sb = getServiceClient();
+  const { error } = await sb
+    .from("safi_responses")
+    .upsert({ participant_id: participantId, confirmations: keys }, { onConflict: "participant_id" });
+  if (error) throw error;
+}
+
 export async function getAllResponses(): Promise<ResponseWithName[]> {
   const sb = getServiceClient();
   const { data, error } = await sb
     .from("safi_responses")
     .select(
-      "participant_id, availability, preferences, note, submitted_at, updated_at, safi_participants(name)",
+      "participant_id, availability, preferences, confirmations, note, submitted_at, updated_at, safi_participants(name)",
     );
   if (error) throw error;
   type Raw = ResponseRow & { safi_participants: { name: string } | null };
@@ -55,6 +68,7 @@ export async function getAllResponses(): Promise<ResponseWithName[]> {
     participant_id: r.participant_id,
     availability: normalizeAvailability(r.availability),
     preferences: normalizePrefs(r.preferences),
+    confirmations: normConfirmations(r.confirmations),
     note: r.note,
     submitted_at: r.submitted_at,
     updated_at: r.updated_at,

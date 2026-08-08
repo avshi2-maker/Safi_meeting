@@ -1,5 +1,5 @@
-// exportFormats.ts (src/lib/exportFormats.ts) · updated 07.08.2026 18:40 (Asia/Jerusalem)
-import type { SuggestionOption } from "./types";
+// exportFormats.ts (src/lib/exportFormats.ts) · updated 08.08.2026 08:30 (Asia/Jerusalem)
+import type { Finalist, SuggestionOption } from "./types";
 
 export function buildShareText(
   options: SuggestionOption[],
@@ -25,4 +25,26 @@ export function buildShareText(
 
 export function buildSubject(): string {
   return "תיאום מפגש משפחתי — הצעות מועד";
+}
+
+// invite to the confirmation round (shared once, replaces "מה מתאים לכם?")
+export function buildConfirmInvite(origin: string): string {
+  return [
+    "משפחה יקרה 💛",
+    "פתחנו סבב אישור למועד המפגש.",
+    "כנסו, בחרו את השם שלכם וסמנו ✓ מה שמתאים לכם:",
+    `${origin}/confirm`,
+    "אפשר גם לראות מה כולם בחרו. תודה!",
+  ].join("\n");
+}
+
+// final locked announcement for the group
+export function buildAnnounce(final: Finalist, confirmedNames: string[]): string {
+  const lines: string[] = [];
+  lines.push("🎉 נקבע! המפגש המשפחתי ייערך:");
+  lines.push(`📅 ${final.label_he}`);
+  lines.push("");
+  if (confirmedNames.length) lines.push(`מגיעים: ${confirmedNames.join(", ")}`);
+  lines.push("נתראה! 💛");
+  return lines.join("\n");
 }

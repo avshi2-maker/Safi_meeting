@@ -11,6 +11,7 @@ import SuggestionCard from "./SuggestionCard";
 import ExportBar from "./ExportBar";
 import ApiCostMeter, { MeterState } from "./ApiCostMeter";
 import BackButton from "./BackButton";
+import ClosingRound from "./ClosingRound";
 
 interface RespItem {
   participant_id: string;
@@ -149,6 +150,8 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
           <ExportBar options={options} responded={responded} total={total} />
         )}
       </div>
+
+      <ClosingRound hasOptions={options.length > 0} />
     </main>
   );
 }

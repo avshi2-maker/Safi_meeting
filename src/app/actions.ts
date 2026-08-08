@@ -66,3 +66,64 @@ export async function isOrganizer(): Promise<boolean> {
   const jar = await cookies();
   return jar.get(ORG_COOKIE)?.value === expected;
 }
+
+// --- confirmation round actions ---
+import { getLatestSuggestion } from "@/lib/suggestions";
+import { getAllResponses, upsertConfirmations } from "@/lib/responses";
+import { publishFinalists, setFinal, reopenRound, getRound, finalistKey } from "@/lib/round";
+import { buildAnnounce } from "@/lib/exportFormats";
+import type { Finalist } from "@/lib/types";
+
+export async function publishFinalistsAction(): Promise<{ ok: boolean; error?: string; count?: number }> {
+  if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
+  const latest = await getLatestSuggestion();
+  const opts = latest?.options ?? [];
+  if (opts.length === 0) return { ok: false, error: "צריך קודם להריץ ניתוח AI" };
+  const finalists: Finalist[] = opts.map((o) => ({ date: o.date, slot: o.slot, label_he: o.label_he }));
+  try {
+    await publishFinalists(finalists);
+    return { ok: true, count: finalists.length };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+export async function lockFinalAction(key: string): Promise<{ ok: boolean; error?: string }> {
+  if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
+  const round = await getRound();
+  const chosen = round.finalists.find((f) => finalistKey(f) === key);
+  if (!chosen) return { ok: false, error: "מועד לא נמצא" };
+  const responses = await getAllResponses();
+  const confirmedNames = responses.filter((r) => r.confirmations.includes(key)).map((r) => r.name);
+  try {
+    await setFinal(chosen, buildAnnounce(chosen, confirmedNames));
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+export async function reopenRoundAction(): Promise<{ ok: boolean; error?: string }> {
+  if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
+  try {
+    await reopenRound();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+// public: a participant confirms which finalists work for them
+export async function confirmAction(participantId: string, keys: string[]): Promise<{ ok: boolean; error?: string }> {
+  if (!participantId) return { ok: false, error: "חסר מזהה" };
+  const round = await getRound();
+  if (round.status !== "open") return { ok: false, error: "סבב האישור אינו פתוח" };
+  const valid = new Set(round.finalists.map((f) => finalistKey(f)));
+  const filtered = keys.filter((k) => valid.has(k));
+  try {
+    await upsertConfirmations(participantId, filtered);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
