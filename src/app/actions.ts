@@ -91,7 +91,7 @@ export async function lockFinalAction(key: string): Promise<{ ok: boolean; error
   if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
   const round = await getRound();
   const chosen = round.finalists.find((f) => finalistKey(f) === key);
-  if (!chosen) return { ok: false, error: "מועד לא נמצא" };
+  if (!chosen) return { ok: false, error: "צריך קודם לפתוח סבב אישור (הרצת AI + פתיחת סבב)" };
   const responses = await getAllResponses();
   const confirmedCount = responses.filter((r) => r.confirmations.includes(key)).length;
   if (confirmedCount === 0) return { ok: false, error: "אף אחד עוד לא אישר את המועד הזה" };
