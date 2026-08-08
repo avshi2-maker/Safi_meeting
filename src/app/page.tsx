@@ -32,7 +32,7 @@ export default async function Home() {
       <Clock />
 
       {round.status === "open" && (
-        <Link href="/confirm" className="round-banner open">🗳️ נפתח סבב אישור — לחצו לאישור המועד שמתאים לכם</Link>
+        <Link href="/confirm" className="round-banner open">🗳️ נפתח סבב אישור — לחצו לאישור המועד שמתאים לכם וצפו בכל האישורים שנשלחו כולל פרטים</Link>
       )}
       {round.status === "locked" && round.final && (
         <Link href="/confirm" className="round-banner locked">🎉 נקבע! {round.final.label_he} — לחצו לפרטים</Link>

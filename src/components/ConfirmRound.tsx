@@ -82,7 +82,7 @@ export default function ConfirmRound() {
       <div className="hero">
         <div className="kick">סבב אישור</div>
         <h1>אשרו את המועד שמתאים לכם</h1>
-        <p className="subtle">סמנו ✓ בכל מועד שמתאים — אפשר יותר מאחד.</p>
+        <p className="subtle">בלחיצה אחת: סמנו ✓ בכל מועד שמתאים (אפשר יותר מאחד) — ולמטה רואים בשקיפות מלאה מה כל המשפחה בחרה ואישרה.</p>
       </div>
 
       <div className="card">
