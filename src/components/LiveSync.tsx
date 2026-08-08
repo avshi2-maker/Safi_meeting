@@ -6,7 +6,7 @@ import { shortLabelHe } from "@/lib/dates";
 interface Person { id: string; name: string; dates: { date: string; slots: string[] }[]; }
 interface Overview { total: number; responded: number; people: Person[]; }
 
-export default function LiveSync({ selfId }: { selfId: string }) {
+export default function LiveSync({ selfId, title = "מה שאר המשפחה כבר בחרו" }: { selfId: string; title?: string }) {
   const [data, setData] = useState<Overview | null>(null);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function LiveSync({ selfId }: { selfId: string }) {
 
   return (
     <div className="card live">
-      <h3>מה שאר המשפחה כבר בחרו <span className="live-dot" /></h3>
+      <h3>{title} <span className="live-dot" /></h3>
       <p className="subtle" style={{ marginTop: -4 }}>
         {data ? `${data.responded}/${data.total} השיבו · מתעדכן אוטומטית` : "טוען…"}
       </p>

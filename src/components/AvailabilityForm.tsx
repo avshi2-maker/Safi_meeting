@@ -1,6 +1,7 @@
 "use client";
 // AvailabilityForm.tsx (src/components/AvailabilityForm.tsx) · updated 07.08.2026 20:55 (Asia/Jerusalem)
 import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { SLOTS } from "@/lib/slots";
 import { WINDOW_MONTHS, shortLabelHe } from "@/lib/dates";
 import { saveAvailabilityAction } from "@/app/actions";
@@ -8,7 +9,6 @@ import type { Availability, Preferences, SlotKey } from "@/lib/types";
 import MonthCalendar from "./MonthCalendar";
 import BackButton from "./BackButton";
 import PreferencesSelector from "./PreferencesSelector";
-import LiveSync from "./LiveSync";
 
 const ALL_SLOTS: SlotKey[] = SLOTS.map((s) => s.key);
 
@@ -29,6 +29,7 @@ export default function AvailabilityForm({ participant, existing }: Props) {
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
   const [pending, start] = useTransition();
+  const router = useRouter();
 
   const selected = useMemo(() => new Set(Object.keys(av)), [av]);
   const sortedDates = useMemo(() => Object.keys(av).sort(), [av]);
@@ -70,7 +71,7 @@ export default function AvailabilityForm({ participant, existing }: Props) {
     setErr("");
     start(async () => {
       const res = await saveAvailabilityAction(participant.id, av, prefs, note);
-      if (res.ok) setSaved(true);
+      if (res.ok) { setSaved(true); setTimeout(() => router.push("/"), 1400); }
       else setErr(res.error || "שגיאה בשמירה");
     });
   }
@@ -147,13 +148,12 @@ export default function AvailabilityForm({ participant, existing }: Props) {
         </div>
 
         <aside className="respond-side">
-          <LiveSync selfId={participant.id} />
-
           <div className="card save-card desk-save">
             <div className="save-hero"><img src="/safi_4helmets.png" alt="ספי" /></div>
             {err && <div className="err" style={{ marginBottom: 8 }}>{err}</div>}
             <button className={btnCls} onClick={save} disabled={pending || totalPicked === 0}>{saveLabel}</button>
             {dirty && <p className="save-nudge">יש לכם בחירות שלא נשמרו — אל תשכחו לשמור!</p>}
+            {saved && <p className="save-note">אבשי יסכם וישלח לכם הודעת ווטסאפ 💛 מעבירים אתכם למסך הראשי…</p>}
             <button className="btn btn-ghost btn-block" style={{ marginTop: 10 }} onClick={() => window.print()}>🖨️ הדפסה</button>
           </div>
         </aside>

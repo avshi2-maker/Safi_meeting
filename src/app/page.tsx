@@ -1,10 +1,11 @@
-// page.tsx (src/app/page.tsx) · updated 07.08.2026 20:20 (Asia/Jerusalem)
+// page.tsx (src/app/page.tsx) · updated 08.08.2026 12:50 (Asia/Jerusalem)
 import Link from "next/link";
 import { ensureSeeded, getParticipants } from "@/lib/participants";
 import { getAllResponses } from "@/lib/responses";
 import { getRound } from "@/lib/round";
 import AddPerson from "@/components/AddPerson";
 import Clock from "@/components/Clock";
+import LiveSync from "@/components/LiveSync";
 
 export const dynamic = "force-dynamic";
 
@@ -19,33 +20,25 @@ export default async function Home() {
 
   return (
     <main className="wrap home">
+      <div className="home-banner">
+        <div className="home-banner-title">🗓️ מתאמים מפגש משפחתי</div>
+        <div className="home-banner-sub">ספטמבר–נובמבר 2026 · בוחרים יחד תאריך שמתאים לכולם</div>
+      </div>
+
       <Clock />
 
       {round.status === "open" && (
-        <Link href="/confirm" className="round-banner open">
-          🗳️ נפתח סבב אישור — לחצו לאישור המועד שמתאים לכם
-        </Link>
+        <Link href="/confirm" className="round-banner open">🗳️ נפתח סבב אישור — לחצו לאישור המועד שמתאים לכם</Link>
       )}
       {round.status === "locked" && round.final && (
-        <Link href="/confirm" className="round-banner locked">
-          🎉 נקבע! {round.final.label_he} — לחצו לפרטים
-        </Link>
+        <Link href="/confirm" className="round-banner locked">🎉 נקבע! {round.final.label_he} — לחצו לפרטים</Link>
       )}
 
-      <div className="hero">
-        <div className="kick">מפגש משפחתי · ספטמבר–נובמבר 2026</div>
-        <h1>מתאמים תאריך שמתאים לכולם</h1>
-      </div>
-
-      <div className="home-split">
-        <div className="home-photo">
-          <img src="/safi_backround.png" alt="ספי" />
-        </div>
-
-        <div className="home-content">
-          <div className="card">
+      <div className="home3">
+        <div className="home3-names">
+          <div className="card glass">
             <h2>משפחות בן נון וביטי</h2>
-            <p className="subtle" style={{ marginTop: -2, marginBottom: 12 }}>בבקשה לבחור תאריכים למפגש בלחיצה על השם</p>
+            <p className="subtle" style={{ marginTop: -2, marginBottom: 12 }}>בחרו את השם שלכם כדי לסמן תאריכים</p>
             <div className="namegrid">
               {participants.map((p) => {
                 const cls = "namebtn" + (done.has(p.id) ? " done" : "");
@@ -59,6 +52,14 @@ export default async function Home() {
             </div>
             <AddPerson />
           </div>
+        </div>
+
+        <div className="home3-photo">
+          <img src="/safi_backround.png" alt="ספי" />
+        </div>
+
+        <div className="home3-live">
+          <LiveSync selfId="" title="מי כבר מילא/ה" />
         </div>
       </div>
 

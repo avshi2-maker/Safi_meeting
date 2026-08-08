@@ -376,3 +376,26 @@ textarea.input { resize: vertical; min-height: 64px; }
 
 .loc-card { border: 1.5px solid var(--blue-border); background: var(--blue-bg); border-radius: 14px; padding: 14px; }
 .loc-result { margin-top: 10px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+
+/* --- v11: home hub (3-col), big banner, respond save note --- */
+.home { max-width: 1120px; }
+.home-banner {
+  background: linear-gradient(120deg, var(--accent) 0%, var(--amber) 100%);
+  color: #fff; border-radius: 20px; padding: 24px 20px; text-align: center;
+  box-shadow: 0 12px 30px rgba(200,95,69,.28); margin-bottom: 12px;
+}
+.home-banner-title { font-size: 32px; font-weight: 800; letter-spacing: .5px; text-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.home-banner-sub { font-size: 15px; opacity: .96; margin-top: 6px; font-weight: 600; }
+
+.home3 { display: grid; gap: 16px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 1000px) {
+  .home3 { grid-template-columns: 1.1fr 0.85fr 1fr; }
+  .home3-photo { position: sticky; top: 12px; }
+}
+.home3 .namegrid { grid-template-columns: 1fr; }
+.home3-photo { text-align: center; }
+.home3-photo img { width: 100%; height: auto; border-radius: 16px; border: 4px solid #fff; box-shadow: var(--shadow); display: block; margin: 0 auto; }
+@media (max-width: 999px) { .home3-photo img { max-height: 40vh; width: auto; max-width: 100%; } }
+
+.save-note { color: var(--green-d); font-weight: 700; font-size: 13px; margin: 8px 0 0; }
+@media (max-width: 520px) { .home-banner-title { font-size: 25px; } }
