@@ -41,3 +41,13 @@ export async function reopenRound(): Promise<void> {
 export async function setLocation(location: MeetLocation | null): Promise<void> {
   await patchRound({ location });
 }
+
+export async function getLastNotified(): Promise<string | null> {
+  const sb = getServiceClient();
+  const { data, error } = await sb.from("safi_round").select("last_notified").eq("id", 1).maybeSingle();
+  if (error) throw error;
+  return (data?.last_notified as string) ?? null;
+}
+export async function setLastNotified(ts: string): Promise<void> {
+  await patchRound({ last_notified: ts });
+}
