@@ -69,10 +69,9 @@ export async function isOrganizer(): Promise<boolean> {
 
 // --- confirmation round actions ---
 import { getLatestSuggestion } from "@/lib/suggestions";
-import { getAllResponses, upsertConfirmations } from "@/lib/responses";
-import { publishFinalists, setFinal, reopenRound, getRound, finalistKey } from "@/lib/round";
-import { buildAnnounce } from "@/lib/exportFormats";
-import type { Finalist } from "@/lib/types";
+import { upsertConfirmations } from "@/lib/responses";
+import { publishFinalists, setFinal, reopenRound, getRound, setLocation, finalistKey } from "@/lib/round";
+import type { Finalist, MeetLocation } from "@/lib/types";
 
 export async function publishFinalistsAction(): Promise<{ ok: boolean; error?: string; count?: number }> {
   if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
@@ -93,10 +92,28 @@ export async function lockFinalAction(key: string): Promise<{ ok: boolean; error
   const round = await getRound();
   const chosen = round.finalists.find((f) => finalistKey(f) === key);
   if (!chosen) return { ok: false, error: "מועד לא נמצא" };
-  const responses = await getAllResponses();
-  const confirmedNames = responses.filter((r) => r.confirmations.includes(key)).map((r) => r.name);
   try {
-    await setFinal(chosen, buildAnnounce(chosen, confirmedNames));
+    await setFinal(chosen);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+export async function saveLocationAction(loc: MeetLocation): Promise<{ ok: boolean; error?: string }> {
+  if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
+  try {
+    await setLocation(loc);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+export async function clearLocationAction(): Promise<{ ok: boolean; error?: string }> {
+  if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
+  try {
+    await setLocation(null);
     return { ok: true };
   } catch (e) {
     return { ok: false, error: (e as Error).message };

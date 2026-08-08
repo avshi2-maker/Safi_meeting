@@ -1,13 +1,13 @@
-// route.ts (src/app/api/round/route.ts) · updated 08.08.2026 08:30 (Asia/Jerusalem)
+// route.ts (src/app/api/round/route.ts) · updated 08.08.2026 09:30 (Asia/Jerusalem)
 import { NextResponse } from "next/server";
 import { getParticipants } from "@/lib/participants";
 import { getAllResponses } from "@/lib/responses";
 import { getRound, finalistKey } from "@/lib/round";
+import { buildAnnounce } from "@/lib/exportFormats";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-// Public, full-transparency view for the family confirmation page.
 export async function GET() {
   const [participants, responses, round] = await Promise.all([
     getParticipants(),
@@ -39,6 +39,15 @@ export async function GET() {
   for (const f of round.finalists) {
     const k = finalistKey(f);
     counts[k] = responses.filter((r) => r.confirmations.includes(k)).length;
+  }
+
+  // Compute the final announcement live so it always reflects current location + confirmers.
+  if (round.final) {
+    const key = finalistKey(round.final);
+    const confirmers = participants
+      .filter((p) => byId.get(p.id)?.confirmations.includes(key))
+      .map((p) => ({ name: p.name, phone: p.phone }));
+    round.announcement = buildAnnounce(round.final, confirmers, round.location);
   }
 
   return NextResponse.json({ round, total: participants.length, people, counts });

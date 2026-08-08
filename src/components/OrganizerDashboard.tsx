@@ -12,6 +12,7 @@ import ExportBar from "./ExportBar";
 import ApiCostMeter, { MeterState } from "./ApiCostMeter";
 import BackButton from "./BackButton";
 import ClosingRound from "./ClosingRound";
+import AiHint from "./AiHint";
 
 interface RespItem {
   participant_id: string;
@@ -133,12 +134,16 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
         <h2>הצעות מועד חכמות</h2>
         <p className="subtle">ה-AI קורא את כל התשובות וההערות ומציע עד 3 מועדים אופטימליים.</p>
         <div className="row" style={{ marginTop: 10 }}>
-          <button className="btn btn-primary" onClick={analyze}
-            disabled={meter.state === "running" || responded === 0}>
-            {meter.state === "running" ? "מנתח…" : "✨ חישוב הצעות עם AI"}
+          <button
+            className={"btn btn-primary" + (responded > 0 && options.length === 0 && meter.state !== "running" ? " attn-soft" : "")}
+            onClick={analyze} disabled={meter.state === "running" || responded === 0}>
+            {meter.state === "running" ? "חושב…" : "✨ 3 הצעות בלחיצה"}
           </button>
           {responded === 0 && <span className="subtle">אין עדיין תגובות לנתח.</span>}
         </div>
+        <AiHint
+          line="לחיצה אחת, 2 שניות — לא יורים על פיל 🐘 (ורק אתם רואים את זה)"
+          more="ה-AI קורא את כל הזמינות וההערות ומציע 3 מועדים. זו הפעולה ה'חכמה' היחידה — והיא רק אצלכם, המשפחה לא רואה אותה בכלל." />
 
         <ApiCostMeter meter={meter} />
 

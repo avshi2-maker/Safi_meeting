@@ -1,5 +1,5 @@
-// exportFormats.ts (src/lib/exportFormats.ts) · updated 08.08.2026 08:30 (Asia/Jerusalem)
-import type { Finalist, SuggestionOption } from "./types";
+// exportFormats.ts (src/lib/exportFormats.ts) · updated 08.08.2026 09:30 (Asia/Jerusalem)
+import type { Finalist, MeetLocation, SuggestionOption } from "./types";
 
 export function buildShareText(
   options: SuggestionOption[],
@@ -27,7 +27,6 @@ export function buildSubject(): string {
   return "תיאום מפגש משפחתי — הצעות מועד";
 }
 
-// invite to the confirmation round (shared once, replaces "מה מתאים לכם?")
 export function buildConfirmInvite(origin: string): string {
   return [
     "משפחה יקרה 💛",
@@ -38,13 +37,28 @@ export function buildConfirmInvite(origin: string): string {
   ].join("\n");
 }
 
-// final locked announcement for the group
-export function buildAnnounce(final: Finalist, confirmedNames: string[]): string {
+export function buildAnnounce(
+  final: Finalist,
+  confirmers: { name: string; phone: string | null }[],
+  location: MeetLocation | null,
+): string {
   const lines: string[] = [];
-  lines.push("🎉 נקבע! המפגש המשפחתי ייערך:");
+  lines.push("🎉 נקבע! המפגש המשפחתי:");
   lines.push(`📅 ${final.label_he}`);
+  if (location && location.place) {
+    lines.push(`📍 ${location.place}${location.address ? ` — ${location.address}` : ""}`);
+    if (location.waze) lines.push(`🧭 ניווט ב-Waze: ${location.waze}`);
+  }
   lines.push("");
-  if (confirmedNames.length) lines.push(`מגיעים: ${confirmedNames.join(", ")}`);
+  if (confirmers.length) {
+    lines.push(`מגיעים (${confirmers.length}):`);
+    confirmers.forEach((c) => lines.push(`• ${c.name}${c.phone ? ` · ${c.phone}` : ""}`));
+  }
+  lines.push("");
   lines.push("נתראה! 💛");
   return lines.join("\n");
+}
+
+export function buildWazeLink(query: string): string {
+  return `https://waze.com/ul?q=${encodeURIComponent(query)}&navigate=yes`;
 }

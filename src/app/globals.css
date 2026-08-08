@@ -356,3 +356,23 @@ textarea.input { resize: vertical; min-height: 64px; }
 .person-date .pd-slots { color: var(--green-d); }
 .person-date .pd-remark { color: var(--muted); }
 .person-note { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+/* --- v8: AI hint (mobile helper), soft pulse, location editor --- */
+.ai-hint { margin: 8px 0 2px; }
+.ai-hint-row { display: flex; align-items: center; gap: 8px; }
+.ai-hint-line { font-size: 13px; color: var(--muted); }
+.ai-hint-q {
+  width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--blue-border);
+  background: var(--blue-bg); color: var(--blue-ink); font-weight: 800; font-size: 12px;
+  cursor: pointer; line-height: 1; flex: none;
+}
+.ai-hint-more { margin-top: 6px; font-size: 13px; color: var(--ink); background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 10px; padding: 8px 10px; }
+
+.attn-soft { animation: attn-soft 1.6s ease-in-out infinite; }
+@keyframes attn-soft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(224,122,95,0); }
+  50% { box-shadow: 0 0 0 5px rgba(224,122,95,.22); }
+}
+
+.loc-card { border: 1.5px solid var(--blue-border); background: var(--blue-bg); border-radius: 14px; padding: 14px; }
+.loc-result { margin-top: 10px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }

@@ -6,6 +6,7 @@ import { finalistKey } from "@/lib/roundView";
 import type { RoundView } from "@/lib/roundView";
 import FinalistBar from "./FinalistBar";
 import PublicTally from "./PublicTally";
+import LocationEditor from "./LocationEditor";
 
 type ActionResult = { ok: boolean; error?: string };
 
@@ -82,6 +83,10 @@ export default function ClosingRound({ hasOptions }: { hasOptions: boolean }) {
             <button className="btn btn-ghost" onClick={() => act(() => reopenRoundAction())}>פתיחה מחדש</button>
           </div>
         </div>
+      )}
+
+      {(status === "open" || status === "locked") && (
+        <div style={{ marginTop: 14 }}><LocationEditor location={view.round.location} onSaved={pull} /></div>
       )}
 
       {finalists.length > 0 && <div style={{ marginTop: 14 }}><PublicTally people={view.people} finalists={finalists} /></div>}

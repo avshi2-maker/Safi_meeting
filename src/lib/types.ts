@@ -70,9 +70,16 @@ export interface Finalist {
 
 export type RoundStatus = "idle" | "open" | "locked";
 
+export interface MeetLocation {
+  place: string;
+  address: string;
+  waze: string;
+}
+
 export interface Round {
   finalists: Finalist[];
   status: RoundStatus;
   final: Finalist | null;
   announcement: string | null;
+  location: MeetLocation | null;
 }
