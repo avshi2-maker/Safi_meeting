@@ -30,7 +30,10 @@ export default function HeatmapCalendar({ counts, total }: Props) {
                 const style = { background: shade(c, total) };
                 const title = `${cell.date}: ${c} פנויים`;
                 return (
-                  <div key={i} className="heat-cell" style={style} title={title}>{c > 0 ? c : ""}</div>
+                  <div key={i} className="heat-cell" style={style} title={title}>
+                    <span className="hc-day">{cell.day}</span>
+                    {c > 0 && <span className="hc-count">{c}</span>}
+                  </div>
                 );
               })}
             </div>

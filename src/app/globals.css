@@ -434,3 +434,8 @@ textarea.input { resize: vertical; min-height: 64px; }
 .tp-steps li.todo .tp-ic { background: #fff; border: 1.5px solid var(--blue-border); color: var(--muted); }
 .tp-steps li.todo .tp-txt { color: var(--muted); }
 .tp-txt em { font-style: normal; color: var(--muted); font-weight: 600; }
+
+/* --- v15: heatmap shows date + count --- */
+.heat-cell { flex-direction: column; gap: 1px; position: relative; }
+.hc-day { font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1; }
+.hc-count { font-size: 10px; font-weight: 800; color: var(--green-d); background: rgba(255,255,255,.75); border-radius: 999px; padding: 0 5px; line-height: 1.4; }
