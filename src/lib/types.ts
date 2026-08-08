@@ -14,6 +14,7 @@ export type RawAvailability = Record<string, SlotKey[] | DaySelection>;
 export interface Preferences {
   activities: string[];
   freeIdea?: string;
+  location?: string; // this person's suggestion for where to meet
 }
 
 export interface Participant {

@@ -14,7 +14,7 @@ export interface PersonView {
   name: string;
   responded: boolean;
   note: string | null;
-  prefs: { activities: string[]; freeIdea?: string };
+  prefs: { activities: string[]; freeIdea?: string; location?: string };
   confirmations: string[];
   dates: { date: string; slots: SlotKey[]; remark: string | null }[];
 }

@@ -133,6 +133,13 @@ export default function AvailabilityForm({ participant, existing }: Props) {
           </div>
 
           <div className="card">
+            <h3>איפה נוח לכם להיפגש?</h3>
+            <p className="subtle" style={{ marginTop: -4 }}>הצעה — לא חובה. אזור, מקום, או כתובת. ה-AI יאסוף את כל ההצעות.</p>
+            <input className="input" value={prefs.location ?? ""} placeholder="לדוגמה: אזור הרצליה / אצלי בבית / מסעדה במרכז"
+              onChange={(e) => { setPrefs({ ...prefs, location: e.target.value }); setSaved(false); }} />
+          </div>
+
+          <div className="card">
             <h3>הערה כללית (לא חובה)</h3>
             <textarea className="input" value={note} placeholder="לדוגמה: בחו״ל 10–20/10, כל ערב מלבד שלישי…"
               onChange={(e) => { setNote(e.target.value); setSaved(false); }} />

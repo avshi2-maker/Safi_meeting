@@ -1,11 +1,13 @@
 "use client";
-// LocationEditor.tsx (src/components/LocationEditor.tsx) · updated 08.08.2026 09:30 (Asia/Jerusalem)
+// LocationEditor.tsx (src/components/LocationEditor.tsx) · updated 08.08.2026 12:10 (Asia/Jerusalem)
 import { useState, useTransition } from "react";
 import { saveLocationAction, clearLocationAction } from "@/app/actions";
 import { buildWazeLink } from "@/lib/exportFormats";
 import type { MeetLocation } from "@/lib/types";
 import AiHint from "./AiHint";
 import ApiCostMeter, { MeterState } from "./ApiCostMeter";
+
+interface Suggestion { name: string; text: string; }
 
 export default function LocationEditor({
   location, onSaved,
@@ -14,14 +16,15 @@ export default function LocationEditor({
   const [place, setPlace] = useState(location?.place ?? "");
   const [address, setAddress] = useState(location?.address ?? "");
   const [waze, setWaze] = useState(location?.waze ?? "");
+  const [reason, setReason] = useState("");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [meter, setMeter] = useState<MeterState>({ state: "idle" });
   const [cleaned, setCleaned] = useState(!!location);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
   const [pending, start] = useTransition();
 
-  async function clean() {
-    if (!text.trim()) return;
+  async function run() {
     setErr(""); setSaved(false);
     setMeter({ state: "running", elapsedMs: 0 });
     const t0 = Date.now();
@@ -30,10 +33,10 @@ export default function LocationEditor({
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
-      if (!res.ok) throw new Error(res.status === 401 ? "אין הרשאה" : "ניקוי נכשל");
+      if (!res.ok) throw new Error(res.status === 401 ? "אין הרשאה" : "הבחירה נכשלה");
       const d = await res.json();
       setPlace(d.place || ""); setAddress(d.address || ""); setWaze(d.waze || "");
-      setCleaned(true);
+      setReason(d.reason_he || ""); setSuggestions(d.suggestions || []); setCleaned(true);
       setMeter({ state: "done", model: d.model, inputTokens: d.usage.input_tokens, outputTokens: d.usage.output_tokens, costUsd: d.cost_usd, elapsedMs: Date.now() - t0 });
     } catch (e) {
       setMeter({ state: "error", error: (e as Error).message, elapsedMs: Date.now() - t0 });
@@ -53,7 +56,7 @@ export default function LocationEditor({
   function clear() {
     start(async () => {
       await clearLocationAction();
-      setText(""); setPlace(""); setAddress(""); setWaze(""); setCleaned(false); setSaved(false);
+      setText(""); setPlace(""); setAddress(""); setWaze(""); setReason(""); setCleaned(false); setSaved(false);
       onSaved();
     });
   }
@@ -61,28 +64,35 @@ export default function LocationEditor({
   return (
     <div className="loc-card">
       <h3>מיקום המפגש</h3>
-      <p className="subtle" style={{ marginTop: -4 }}>כתבו חופשי — שם מקום, מסעדה, כתובת, או הדביקו קישור Waze / Maps.</p>
+      <p className="subtle" style={{ marginTop: -4 }}>ה-AI אוסף את כל הצעות המיקום מהמשפחה ובוחר מקום. אפשר להוסיף רמז או להדביק קישור Waze / Maps.</p>
 
       <textarea className="input" value={text} rows={2}
-        placeholder="לדוגמה: אצל ספי ליד המרינה בהרצליה, מסעדת הדגים, ההגנה 5…"
+        placeholder="רמז אופציונלי — למשל 'עדיף מרכז', 'קרוב לספי', או הדביקו קישור Waze…"
         onChange={(e) => setText(e.target.value)} />
       <div className="row" style={{ marginTop: 8 }}>
-        <button className="btn btn-primary" onClick={clean} disabled={meter.state === "running" || !text.trim()}>
-          {meter.state === "running" ? "מסדר…" : "✨ נקה וסדר לי את הכתובת"}
+        <button className="btn btn-primary" onClick={run} disabled={meter.state === "running"}>
+          {meter.state === "running" ? "בוחר…" : "✨ בחר מיקום מהצעות המשפחה"}
         </button>
       </div>
-      <AiHint line="כתבו בלגן — נקבל כתובת מסודרת + לינק לוויז." more="ה-AI לא ממציא כתובות: אם משהו לא ברור הוא ישאיר ריק, ותוכלו להשלים ידנית. לבית פרטי — הכי בטוח להדביק כתובת מדויקת או קישור Waze." />
+      <AiHint line="כתבו בלגן (או כלום) — נאסוף את הצעות כולם ונבחר מקום + לינק לוויז." more="ה-AI קורא את מה שכל אחד הציע ובוחר מקום מרכזי ונוח. הוא לא ממציא כתובת מדויקת — לבית פרטי הכי בטוח להדביק כתובת או קישור Waze." />
 
       <ApiCostMeter meter={meter} />
 
       {cleaned && (
         <div className="loc-result">
+          {reason && <div className="subtle" style={{ marginBottom: 8 }}>💡 {reason}</div>}
           <div className="label">שם המקום</div>
           <input className="input" value={place} onChange={(e) => onPlace(e.target.value)} />
           <div className="label">כתובת</div>
           <input className="input" value={address} onChange={(e) => onAddress(e.target.value)} />
           {waze && (
             <a className="btn btn-ghost" href={waze} target="_blank" rel="noreferrer" style={{ marginTop: 10, display: "inline-flex" }}>🧭 בדיקה ב-Waze</a>
+          )}
+          {suggestions.length > 0 && (
+            <div className="remarks">
+              <div className="remarks-h">הצעות המשפחה שנשקלו</div>
+              {suggestions.map((s, i) => <div key={i} className="remark-line"><b>{s.name}:</b> {s.text}</div>)}
+            </div>
           )}
           {err && <div className="err" style={{ marginTop: 8 }}>{err}</div>}
           <div className="row" style={{ marginTop: 10 }}>

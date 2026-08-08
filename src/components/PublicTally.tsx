@@ -46,6 +46,13 @@ export default function PublicTally({ people, finalists, mode = "availability" }
               </div>
             )}
 
+            {p.prefs.location && (
+              <div className="person-line">
+                <span className="lbl">מיקום מועדף:</span>
+                <span className="tag maybe">📍 {p.prefs.location}</span>
+              </div>
+            )}
+
             {p.dates.length > 0 && (
               <div className="person-dates">
                 {p.dates.map((d) => (

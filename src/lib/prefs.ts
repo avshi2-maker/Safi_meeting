@@ -17,6 +17,7 @@ export function normalizePrefs(raw: unknown): Preferences {
   return {
     activities: Array.isArray(r.activities) ? r.activities.filter((k) => !!ACTIVITY_HE[k]) : [],
     freeIdea: typeof r.freeIdea === "string" ? r.freeIdea : undefined,
+    location: typeof r.location === "string" ? r.location : undefined,
   };
 }
 
