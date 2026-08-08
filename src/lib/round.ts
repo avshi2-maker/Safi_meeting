@@ -7,17 +7,18 @@ export async function getRound(): Promise<Round> {
   const sb = getServiceClient();
   const { data, error } = await sb
     .from("safi_round")
-    .select("finalists, status, final, announcement, location")
+    .select("finalists, status, final, announcement, location, finalists_at")
     .eq("id", 1)
     .maybeSingle();
   if (error) throw error;
-  if (!data) return { finalists: [], status: "idle", final: null, announcement: null, location: null };
+  if (!data) return { finalists: [], status: "idle", final: null, announcement: null, location: null, finalists_at: null };
   return {
     finalists: Array.isArray(data.finalists) ? (data.finalists as Finalist[]) : [],
     status: (data.status ?? "idle") as RoundStatus,
     final: (data.final as Finalist) ?? null,
     announcement: data.announcement ?? null,
     location: (data.location as MeetLocation) ?? null,
+    finalists_at: (data.finalists_at as string) ?? null,
   };
 }
 
@@ -30,7 +31,7 @@ async function patchRound(patch: Record<string, unknown>): Promise<void> {
 }
 
 export async function publishFinalists(finalists: Finalist[]): Promise<void> {
-  await patchRound({ finalists, status: "open", final: null });
+  await patchRound({ finalists, status: "open", final: null, finalists_at: new Date().toISOString() });
 }
 export async function setFinal(final: Finalist): Promise<void> {
   await patchRound({ final, status: "locked" });

@@ -8,6 +8,7 @@ import {
   computeCandidates,
   candidateMap,
   remarksByDate,
+  enforceDistinctDates,
   assembleOptions,
   fallbackOptions,
   buildSystemPrompt,
@@ -85,7 +86,15 @@ export async function POST() {
     const text = textBlock && "text" in textBlock ? textBlock.text : "";
     const parsed = extractJson(text);
     if (parsed && Array.isArray(parsed.options)) {
-      const assembled = assembleOptions(parsed.options as never, cmap, allNames, remarks);
+      const picks = parsed.options as { date: string; slot: string; reason_he?: string; maybe?: string[] }[];
+      const modelKeys = picks.map((p) => `${p.date}|${p.slot}`);
+      const finalKeys = enforceDistinctDates(modelKeys, cands, 3);
+      const finalPicks = finalKeys.map((k) => {
+        const [date, slot] = k.split("|");
+        const mp = picks.find((p) => `${p.date}|${p.slot}` === k);
+        return { date, slot, reason_he: mp?.reason_he, maybe: mp?.maybe };
+      });
+      const assembled = assembleOptions(finalPicks, cmap, allNames, remarks);
       if (assembled.length) options = assembled;
     }
   } catch {

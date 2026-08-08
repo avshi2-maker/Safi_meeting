@@ -47,6 +47,15 @@ export default function ClosingRound({ hasOptions }: { hasOptions: boolean }) {
   function shareAnnounce() {
     if (view?.round.announcement) window.open(`https://wa.me/?text=${encodeURIComponent(view.round.announcement)}`, "_blank");
   }
+  function refresh() {
+    setErr("");
+    start(async () => {
+      try { await fetch("/api/analyze", { method: "POST", cache: "no-store" }); } catch { /* keep going */ }
+      const r = await publishFinalistsAction();
+      if (!r.ok) setErr(r.error === "unauthorized" ? "אין הרשאה" : r.error || "שגיאה");
+      pull();
+    });
+  }
 
   if (!view) return <div className="card">טוען סבב…</div>;
 
@@ -63,12 +72,18 @@ export default function ClosingRound({ hasOptions }: { hasOptions: boolean }) {
         </div>
       ) : status === "open" ? (
         <div>
+          {view.stale && (
+            <div className="stale-banner">
+              ⚠️ התקבלו עדכונים חדשים מאז שההצעות פורסמו — ההצעות אולי לא מעודכנות.
+              <button className="btn btn-primary" style={{ marginInlineStart: 10 }} onClick={refresh} disabled={pending}>🔄 רענון הצעות</button>
+            </div>
+          )}
           <p className="subtle">בחרו מועד לנעילה (ברירת מחדל: המוביל), ושתפו את קישור האישור בקבוצה.</p>
           <FinalistBar finalists={finalists} counts={counts} total={total} leaderKey={leaderKey} selectedKey={selectedKey} onSelect={setSelectedKey} />
           <div className="row" style={{ marginTop: 12 }}>
             <button className="btn-lock" onClick={() => act(() => lockFinalAction(selectedKey))} disabled={pending || !selectedKey || (counts[selectedKey] ?? 0) === 0} title="פעולה זו מתבצעת על ידי אבשי בלבד">🔒 נעילת מועד סופי</button>
             <button className="btn btn-green" onClick={shareInvite}>🟢 שליחת קישור האישור</button>
-            <button className="btn btn-ghost" onClick={() => act(() => publishFinalistsAction())}>עדכון מהניתוח האחרון</button>
+            <button className="btn btn-ghost" onClick={refresh} disabled={pending}>🔄 רענון הצעות (הרצת AI מחדש)</button>
           </div>
           {selectedKey && (counts[selectedKey] ?? 0) === 0 && (
             <p className="save-nudge">אף אחד עוד לא אישר את המועד הזה — שתפו את קישור האישור וחכו לאישור ראשון.</p>

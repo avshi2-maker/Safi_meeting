@@ -24,4 +24,5 @@ export interface RoundView {
   total: number;
   people: PersonView[];
   counts: Record<string, number>;
+  stale?: boolean;
 }

@@ -99,6 +99,33 @@ export function buildCandidateBlock(cands: Candidate[], limit = 14): string {
     .join("\n");
 }
 
+// Prefer up to `max` options on DISTINCT dates: model picks first, then best
+// remaining candidates by attendance, then (only if too few distinct dates) fill.
+export function enforceDistinctDates(preferred: string[], cands: Candidate[], max = 3): string[] {
+  const dateOf = (k: string) => k.split("|")[0];
+  const chosen: string[] = [];
+  const usedDates = new Set<string>();
+  for (const k of preferred) {
+    if (chosen.length >= max) break;
+    if (!usedDates.has(dateOf(k))) { chosen.push(k); usedDates.add(dateOf(k)); }
+  }
+  for (const c of cands) {
+    if (chosen.length >= max) break;
+    const k = keyOf(c.date, c.slot);
+    if (!usedDates.has(c.date) && !chosen.includes(k)) { chosen.push(k); usedDates.add(c.date); }
+  }
+  for (const k of preferred) {
+    if (chosen.length >= max) break;
+    if (!chosen.includes(k)) chosen.push(k);
+  }
+  for (const c of cands) {
+    if (chosen.length >= max) break;
+    const k = keyOf(c.date, c.slot);
+    if (!chosen.includes(k)) chosen.push(k);
+  }
+  return chosen.slice(0, max);
+}
+
 export function assembleOptions(
   picks: { date: string; slot: string; reason_he?: string; maybe?: string[] }[],
   cmap: Map<string, string[]>,
@@ -135,22 +162,28 @@ export function fallbackOptions(
   allNames: string[],
   remarks: Map<string, OptionRemark[]>,
 ): SuggestionOption[] {
-  return cands.slice(0, 3).map((c) => ({
-    date: c.date,
-    slot: c.slot,
-    label_he: fullLabelHe(c.date, c.slot),
-    available: c.available,
-    maybe: [],
-    unavailable: allNames.filter((n) => !c.available.includes(n)),
-    reason_he: `${c.available.length} מתוך ${allNames.length} זמינים במועד זה.`,
-    remarks: remarks.get(c.date) ?? [],
-  }));
+  const byKey = new Map(cands.map((c) => [keyOf(c.date, c.slot), c]));
+  const keys = enforceDistinctDates([], cands, 3);
+  return keys.map((k) => {
+    const c = byKey.get(k)!;
+    return {
+      date: c.date,
+      slot: c.slot,
+      label_he: fullLabelHe(c.date, c.slot),
+      available: c.available,
+      maybe: [],
+      unavailable: allNames.filter((n) => !c.available.includes(n)),
+      reason_he: `${c.available.length} מתוך ${allNames.length} זמינים במועד זה.`,
+      remarks: remarks.get(c.date) ?? [],
+    };
+  });
 }
 
 export function buildSystemPrompt(): string {
   return [
     "אתה עוזר לתאם מפגש משפחתי אחד בין כל המשתתפים, בין 1.9.2026 ל-30.11.2026.",
     "מטרתך: לבחור עד 3 מועדים (תאריך + חלק-יום) שממקסמים את מספר המשתתפים הזמינים.",
+    "העדף 3 תאריכים שונים — אל תציע את אותו יום פעמיים אלא אם אין מספיק ימים חופפים.",
     "בחר אך ורק מתוך רשימת המועדים המועמדים שסופקה.",
     "התחשב בהערות לכל תאריך ובהערות הכלליות (למשל 'רק בערב', 'בחו״ל', 'אחרי 19:00').",
     "החזר JSON תקין בלבד, ללא טקסט נוסף וללא סימוני קוד, במבנה:",

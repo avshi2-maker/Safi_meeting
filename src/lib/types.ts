@@ -83,4 +83,5 @@ export interface Round {
   final: Finalist | null;
   announcement: string | null;
   location: MeetLocation | null;
+  finalists_at: string | null;
 }

@@ -51,5 +51,12 @@ export async function GET(req: Request) {
     round.announcement = buildAnnounce(round.final, confirmers, round.location, origin);
   }
 
-  return NextResponse.json({ round, total: participants.length, people, counts });
+  // Stale = someone changed availability after the finalists were published.
+  let stale = false;
+  if (round.status === "open" && round.finalists.length > 0 && round.finalists_at) {
+    const pub = new Date(round.finalists_at).getTime();
+    stale = responses.some((r) => new Date(r.updated_at).getTime() > pub);
+  }
+
+  return NextResponse.json({ round, total: participants.length, people, counts, stale });
 }
