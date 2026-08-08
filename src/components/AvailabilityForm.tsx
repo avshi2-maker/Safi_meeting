@@ -89,6 +89,8 @@ export default function AvailabilityForm({ participant, existing }: Props) {
         <p className="subtle">לחצו על תאריכים (יום שלם — אפשר לצמצם לחלקי-יום ולהוסיף הערה לכל תאריך).</p>
       </div>
 
+      <div className="card photo-card mobile-only"><img src="/safi_4helmets.png" alt="ספי" /></div>
+
       <div className="respond-grid">
         <div className="respond-main">
           <div className="card">

@@ -298,3 +298,11 @@ textarea.input { resize: vertical; min-height: 64px; }
   .respond-wrap { padding-bottom: 96px; } /* room for the fixed bar */
 }
 @media print { .mobile-save, .save-hero { display: none !important; } }
+
+/* --- v6: show Safi photo on mobile too (desktop keeps it in the save card) --- */
+.mobile-only { display: none; }
+.photo-card { text-align: center; padding: 12px; }
+.photo-card img { width: 100%; max-width: 420px; border-radius: 14px; display: block; margin: 0 auto; box-shadow: var(--shadow); }
+@media (max-width: 899px) {
+  .mobile-only { display: block; }
+}
