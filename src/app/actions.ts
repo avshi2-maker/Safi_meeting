@@ -69,7 +69,7 @@ export async function isOrganizer(): Promise<boolean> {
 
 // --- confirmation round actions ---
 import { getLatestSuggestion } from "@/lib/suggestions";
-import { upsertConfirmations } from "@/lib/responses";
+import { upsertConfirmations, getAllResponses } from "@/lib/responses";
 import { publishFinalists, setFinal, reopenRound, getRound, setLocation, finalistKey } from "@/lib/round";
 import type { Finalist, MeetLocation } from "@/lib/types";
 
@@ -92,6 +92,9 @@ export async function lockFinalAction(key: string): Promise<{ ok: boolean; error
   const round = await getRound();
   const chosen = round.finalists.find((f) => finalistKey(f) === key);
   if (!chosen) return { ok: false, error: "מועד לא נמצא" };
+  const responses = await getAllResponses();
+  const confirmedCount = responses.filter((r) => r.confirmations.includes(key)).length;
+  if (confirmedCount === 0) return { ok: false, error: "אף אחד עוד לא אישר את המועד הזה" };
   try {
     await setFinal(chosen);
     return { ok: true };

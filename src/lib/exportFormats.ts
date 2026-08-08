@@ -41,13 +41,15 @@ export function buildAnnounce(
   final: Finalist,
   confirmers: { name: string; phone: string | null }[],
   location: MeetLocation | null,
+  origin?: string,
 ): string {
   const lines: string[] = [];
   lines.push("🎉 נקבע! המפגש המשפחתי:");
   lines.push(`📅 ${final.label_he}`);
   if (location && location.place) {
     lines.push(`📍 ${location.place}${location.address ? ` — ${location.address}` : ""}`);
-    if (location.waze) lines.push(`🧭 ניווט ב-Waze: ${location.waze}`);
+    // Clean, tappable link on our own domain that redirects into Waze (no %D7 soup).
+    if (location.waze) lines.push(`🧭 ניווט ב-Waze: ${origin ? `${origin}/go` : location.waze}`);
   }
   lines.push("");
   if (confirmers.length) {

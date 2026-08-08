@@ -57,7 +57,7 @@ export default function ConfirmRound() {
           <div className="final-when">{view.round.final.label_he}</div>
           {view.round.announcement && <pre className="final-ann">{view.round.announcement}</pre>}
         </div>
-        <PublicTally people={view.people} finalists={finalists} />
+        <PublicTally people={view.people} finalists={finalists} mode="confirmation" />
       </main>
     );
   }
@@ -107,7 +107,7 @@ export default function ConfirmRound() {
         )}
       </div>
 
-      <PublicTally people={view.people} finalists={finalists} />
+      <PublicTally people={view.people} finalists={finalists} mode="confirmation" />
     </main>
   );
 }

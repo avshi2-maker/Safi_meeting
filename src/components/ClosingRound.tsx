@@ -66,10 +66,13 @@ export default function ClosingRound({ hasOptions }: { hasOptions: boolean }) {
           <p className="subtle">בחרו מועד לנעילה (ברירת מחדל: המוביל), ושתפו את קישור האישור בקבוצה.</p>
           <FinalistBar finalists={finalists} counts={counts} total={total} leaderKey={leaderKey} selectedKey={selectedKey} onSelect={setSelectedKey} />
           <div className="row" style={{ marginTop: 12 }}>
-            <button className="btn-lock" onClick={() => act(() => lockFinalAction(selectedKey))} disabled={pending || !selectedKey} title="פעולה זו מתבצעת על ידי אבשי בלבד">🔒 נעילת מועד סופי</button>
+            <button className="btn-lock" onClick={() => act(() => lockFinalAction(selectedKey))} disabled={pending || !selectedKey || (counts[selectedKey] ?? 0) === 0} title="פעולה זו מתבצעת על ידי אבשי בלבד">🔒 נעילת מועד סופי</button>
             <button className="btn btn-green" onClick={shareInvite}>🟢 שליחת קישור האישור</button>
             <button className="btn btn-ghost" onClick={() => act(() => publishFinalistsAction())}>עדכון מהניתוח האחרון</button>
           </div>
+          {selectedKey && (counts[selectedKey] ?? 0) === 0 && (
+            <p className="save-nudge">אף אחד עוד לא אישר את המועד הזה — שתפו את קישור האישור וחכו לאישור ראשון.</p>
+          )}
         </div>
       ) : (
         <div>
@@ -89,7 +92,7 @@ export default function ClosingRound({ hasOptions }: { hasOptions: boolean }) {
         <div style={{ marginTop: 14 }}><LocationEditor location={view.round.location} onSaved={pull} /></div>
       )}
 
-      {finalists.length > 0 && <div style={{ marginTop: 14 }}><PublicTally people={view.people} finalists={finalists} /></div>}
+      {finalists.length > 0 && <div style={{ marginTop: 14 }}><PublicTally people={view.people} finalists={finalists} mode="confirmation" /></div>}
     </div>
   );
 }

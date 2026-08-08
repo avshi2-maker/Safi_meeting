@@ -7,9 +7,9 @@ import { finalistKey } from "@/lib/roundView";
 import type { PersonView } from "@/lib/roundView";
 import type { Finalist } from "@/lib/types";
 
-interface Props { people: PersonView[]; finalists: Finalist[]; }
+interface Props { people: PersonView[]; finalists: Finalist[]; mode?: "availability" | "confirmation"; }
 
-export default function PublicTally({ people, finalists }: Props) {
+export default function PublicTally({ people, finalists, mode = "availability" }: Props) {
   return (
     <div className="card">
       <h2>מה כולם בחרו — שקוף לכל המשפחה</h2>
@@ -20,10 +20,14 @@ export default function PublicTally({ people, finalists }: Props) {
           <div key={p.id} className="person-card">
             <div className="person-head">
               <span className="person-name">{p.name}</span>
-              {p.responded ? (
-                <span className="pill done">✓ השיב/ה</span>
+              {mode === "confirmation" ? (
+                p.confirmations.length > 0
+                  ? <span className="pill done">✓ אישר/ה</span>
+                  : <span className="pill pending">טרם אישר/ה</span>
               ) : (
-                <span className="pill pending">טרם השיב/ה</span>
+                p.responded
+                  ? <span className="pill done">✓ השיב/ה</span>
+                  : <span className="pill pending">טרם השיב/ה</span>
               )}
             </div>
 

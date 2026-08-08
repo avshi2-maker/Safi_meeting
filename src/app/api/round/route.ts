@@ -8,7 +8,7 @@ import { buildAnnounce } from "@/lib/exportFormats";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(req: Request) {
   const [participants, responses, round] = await Promise.all([
     getParticipants(),
     getAllResponses(),
@@ -47,7 +47,8 @@ export async function GET() {
     const confirmers = participants
       .filter((p) => byId.get(p.id)?.confirmations.includes(key))
       .map((p) => ({ name: p.name, phone: p.phone }));
-    round.announcement = buildAnnounce(round.final, confirmers, round.location);
+    const origin = new URL(req.url).origin;
+    round.announcement = buildAnnounce(round.final, confirmers, round.location, origin);
   }
 
   return NextResponse.json({ round, total: participants.length, people, counts });
