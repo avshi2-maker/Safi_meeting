@@ -13,6 +13,7 @@ import ApiCostMeter, { MeterState } from "./ApiCostMeter";
 import BackButton from "./BackButton";
 import ClosingRound from "./ClosingRound";
 import AiHint from "./AiHint";
+import Teleprompter from "./Teleprompter";
 
 interface RespItem {
   participant_id: string;
@@ -109,6 +110,8 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
         <div className="spacer" />
         <button className="btn btn-ghost" onClick={logout}>יציאה</button>
       </div>
+
+      <Teleprompter responded={responded} total={total} hasOptions={options.length > 0} />
 
       <ResponseTracker participants={participants} respondedIds={respondedIds} />
       <HeatmapCalendar counts={counts} total={total} />
