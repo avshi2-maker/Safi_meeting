@@ -87,7 +87,7 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
 
   async function shareInvite() {
     const origin = window.location.origin;
-    const text = `שלום משפחה 💛\nמתאמים מפגש (ספטמבר–נובמבר).\nכנסו לקישור, בחרו את השם שלכם וסמנו מתי נוח לכם:\n${origin}/\nתודה!`;
+    const text = `שלום לכולם 💛\nמתאמים מפגש משפחתי (ספטמבר–נובמבר).\nכנסו לקישור, בחרו את השם שלכם וסמנו מתי נוח לכם:\n${origin}/\nתודה!`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   }
 
@@ -105,7 +105,7 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
       </div>
 
       <div className="row">
-        <button className="btn btn-green" onClick={shareInvite}>🟢 שליחת הקישור לקבוצה</button>
+        <button className="btn btn-green" onClick={shareInvite}>🟢 שליחת קישור לקבוצה</button>
         <div className="spacer" />
         <button className="btn btn-ghost" onClick={logout}>יציאה</button>
       </div>

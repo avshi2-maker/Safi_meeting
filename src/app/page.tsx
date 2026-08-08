@@ -21,6 +21,10 @@ export default async function Home() {
   return (
     <main className="wrap home">
       <div className="home-banner">
+        <a className="qr-corner" href="/" title="לחצו על הברקוד לקישור מיידי לאתר">
+          <img src="/safi_qr.png" alt="קוד QR לאתר" />
+          <span>סרקו לנייד</span>
+        </a>
         <div className="home-banner-title">🗓️ מתאמים מפגש משפחתי</div>
         <div className="home-banner-sub">ספטמבר–נובמבר 2026 · בוחרים יחד תאריך שמתאים לכולם</div>
       </div>
