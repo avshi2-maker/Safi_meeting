@@ -1,7 +1,7 @@
-// exportFormats.ts (src/lib/exportFormats.ts) · updated 11.08.2026 11:58 (Asia/Jerusalem)
-// buildConfirmInvite() is the SINGLE source of the phase-2 confirm message (flower
-// wording + /confirm link). Both the organizer top share button (OrganizerDashboard)
-// and the closing-round share button (ClosingRound) call it, so they can never drift.
+// exportFormats.ts (src/lib/exportFormats.ts) · updated 11.08.2026 12:12 (Asia/Jerusalem)
+// NO EMOJIS in any outgoing WhatsApp message — Avshi's phone renders them as black
+// boxes. Plain Hebrew text only. buildConfirmInvite() is the single source of the
+// phase-2 confirm message, used by both share buttons (OrganizerDashboard + ClosingRound).
 import type { Finalist, MeetLocation, SuggestionOption } from "./types";
 import { SITE_URL } from "./site";
 
@@ -11,19 +11,19 @@ export function buildShareText(
   total: number,
 ): string {
   const lines: string[] = [];
-  lines.push("🗓️ תיאום מפגש משפחתי — הצעות מועד");
+  lines.push("תיאום מפגש משפחתי — הצעות מועד");
   lines.push(`(על סמך ${responded} מתוך ${total} שהשיבו)`);
   lines.push("");
   options.forEach((o, i) => {
     lines.push(`${i + 1}. ${o.label_he} — ${o.available.length}/${total} יכולים`);
-    if (o.available.length) lines.push(`   ✅ ${o.available.join(", ")}`);
-    if (o.maybe.length) lines.push(`   ❔ אולי: ${o.maybe.join(", ")}`);
-    if (o.unavailable.length) lines.push(`   ❌ לא יכולים: ${o.unavailable.join(", ")}`);
-    if (o.reason_he) lines.push(`   💬 ${o.reason_he}`);
-    (o.remarks ?? []).forEach((r) => lines.push(`   📝 ${r.name}: ${r.text}`));
+    if (o.available.length) lines.push(`   פנויים: ${o.available.join(", ")}`);
+    if (o.maybe.length) lines.push(`   אולי: ${o.maybe.join(", ")}`);
+    if (o.unavailable.length) lines.push(`   לא יכולים: ${o.unavailable.join(", ")}`);
+    if (o.reason_he) lines.push(`   ${o.reason_he}`);
+    (o.remarks ?? []).forEach((r) => lines.push(`   ${r.name}: ${r.text}`));
     lines.push("");
   });
-  lines.push("מה הכי מתאים לכם? תגיבו כאן 🙏");
+  lines.push("מה הכי מתאים לכם? תגיבו כאן.");
   return lines.join("\n");
 }
 
@@ -35,12 +35,12 @@ export function buildSubject(): string {
 // approves the proposed date). Sent by BOTH share buttons — single source of truth.
 export function buildConfirmInvite(origin: string): string {
   return [
-    "שלום למשפחה 🌸",
-    "קיבלנו מכולם מועדים מועדפים למפגש 🌷",
+    "שלום למשפחה",
+    "קיבלנו מכולם מועדים מועדפים למפגש.",
     "בלחיצה אחת אפשר לאשר את המועד שמתאים לכם, וגם לראות מה כולם בחרו — הכל במקום אחד.",
     "לחצו, בחרו את השם שלכם וסמנו:",
     `${origin}/confirm`,
-    "(30 שניות, ואפשר לשנות בכל רגע) 🌼",
+    "(30 שניות, ואפשר לשנות בכל רגע)",
   ].join("\n");
 }
 
@@ -51,20 +51,20 @@ export function buildAnnounce(
   origin?: string,
 ): string {
   const lines: string[] = [];
-  lines.push("🎉 נקבע! המפגש המשפחתי:");
-  lines.push(`📅 ${final.label_he}`);
+  lines.push("נקבע! המפגש המשפחתי:");
+  lines.push(final.label_he);
   if (location && location.place) {
-    lines.push(`📍 ${location.place}${location.address ? ` — ${location.address}` : ""}`);
+    lines.push(`מיקום: ${location.place}${location.address ? ` — ${location.address}` : ""}`);
     // Clean, tappable link on our own domain that redirects into Waze (no %D7 soup).
-    if (location.waze) lines.push(`🧭 ניווט ב-Waze: ${SITE_URL}/go`);
+    if (location.waze) lines.push(`ניווט ב-Waze: ${SITE_URL}/go`);
   }
   lines.push("");
   if (confirmers.length) {
     lines.push(`מגיעים (${confirmers.length}):`);
-    confirmers.forEach((c) => lines.push(`• ${c.name}${c.phone ? ` · ${c.phone}` : ""}`));
+    confirmers.forEach((c) => lines.push(`- ${c.name}${c.phone ? ` · ${c.phone}` : ""}`));
   }
   lines.push("");
-  lines.push("נתראה! 💛");
+  lines.push("נתראה!");
   return lines.join("\n");
 }
 
