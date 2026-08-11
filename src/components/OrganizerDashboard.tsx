@@ -14,6 +14,7 @@ import BackButton from "./BackButton";
 import ClosingRound from "./ClosingRound";
 import AiHint from "./AiHint";
 import Teleprompter from "./Teleprompter";
+import { SITE_URL } from "@/lib/site";
 
 interface RespItem {
   participant_id: string;
@@ -87,7 +88,7 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
   }
 
   async function shareInvite() {
-    const origin = window.location.origin;
+    const origin = SITE_URL;
     const text = `שלום לכולם 💛\nמתאמים מפגש משפחתי (ספטמבר–נובמבר).\nכנסו לקישור, בחרו את השם שלכם וסמנו מתי נוח לכם:\n${origin}/\nתודה!`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   }

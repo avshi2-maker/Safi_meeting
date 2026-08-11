@@ -36,7 +36,7 @@ export default function FinalistBar({
             </div>
             <div className="finalist-when">{f.label_he}</div>
             <div className="finalist-bar"><div className="finalist-fill" style={{ width: `${pct}%` }} /></div>
-            <div className="finalist-count">{n}/{total} אישרו</div>
+            <div className="finalist-count">{n}/{total} אישרו הצעה זו</div>
             {onToggle && (
               <button className={"chip toggle" + (on ? " on" : "")} onClick={(e) => { e.stopPropagation(); onToggle(key); }}>
                 {on ? "✓ מתאים לי" : "סמנו שמתאים"}

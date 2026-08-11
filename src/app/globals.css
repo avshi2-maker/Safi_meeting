@@ -446,3 +446,6 @@ textarea.input { resize: vertical; min-height: 64px; }
   padding: 10px 14px; margin: 10px 0; font-weight: 700; color: #8a5a1f;
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
 }
+
+/* --- v21: red phase-2 confirm CTA --- */
+.confirm-cta { color: #c0392b; font-weight: 800; font-size: 16px; margin-top: 4px; }

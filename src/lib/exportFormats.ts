@@ -1,5 +1,6 @@
 // exportFormats.ts (src/lib/exportFormats.ts) · updated 08.08.2026 09:30 (Asia/Jerusalem)
 import type { Finalist, MeetLocation, SuggestionOption } from "./types";
+import { SITE_URL } from "./site";
 
 export function buildShareText(
   options: SuggestionOption[],
@@ -49,7 +50,7 @@ export function buildAnnounce(
   if (location && location.place) {
     lines.push(`📍 ${location.place}${location.address ? ` — ${location.address}` : ""}`);
     // Clean, tappable link on our own domain that redirects into Waze (no %D7 soup).
-    if (location.waze) lines.push(`🧭 ניווט ב-Waze: ${origin ? `${origin}/go` : location.waze}`);
+    if (location.waze) lines.push(`🧭 ניווט ב-Waze: ${SITE_URL}/go`);
   }
   lines.push("");
   if (confirmers.length) {

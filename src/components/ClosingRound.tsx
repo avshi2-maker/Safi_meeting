@@ -7,6 +7,7 @@ import type { RoundView } from "@/lib/roundView";
 import FinalistBar from "./FinalistBar";
 import PublicTally from "./PublicTally";
 import LocationEditor from "./LocationEditor";
+import { SITE_URL } from "@/lib/site";
 
 type ActionResult = { ok: boolean; error?: string };
 
@@ -41,7 +42,7 @@ export default function ClosingRound({ hasOptions }: { hasOptions: boolean }) {
     });
   }
   function shareInvite() {
-    const t = `משפחה יקרה 💛\nפתחנו סבב אישור למפגש 🎉\nבלחיצה אחת אתם גם מאשרים מה שמתאים לכם, וגם רואים בשקיפות מה כל אחד בחר ואישר — הכל במקום אחד.\n👇 לחצו, בחרו את השם שלכם, וסמנו ✓\n${location.origin}/confirm\n(30 שניות, ואפשר לשנות בכל רגע)`;
+    const t = `משפחה יקרה 💛\nפתחנו סבב אישור למפגש 🎉\nבלחיצה אחת אתם גם מאשרים מה שמתאים לכם, וגם רואים בשקיפות מה כל אחד בחר ואישר — הכל במקום אחד.\n👇 לחצו, בחרו את השם שלכם, וסמנו ✓\n${SITE_URL}/confirm\n(30 שניות, ואפשר לשנות בכל רגע)`;
     window.open(`https://wa.me/?text=${encodeURIComponent(t)}`, "_blank");
   }
   function shareAnnounce() {
