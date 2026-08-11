@@ -10,10 +10,10 @@ import LiveSync from "@/components/LiveSync";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  await ensureSeeded();
+  await ensureSeeded().catch(() => {});
   const [participants, responses, round] = await Promise.all([
-    getParticipants(),
-    getAllResponses(),
+    getParticipants().catch(() => []),
+    getAllResponses().catch(() => []),
     getRound(),
   ]);
   const done = new Set(responses.map((r) => r.participant_id));

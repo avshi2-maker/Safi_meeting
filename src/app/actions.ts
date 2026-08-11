@@ -134,14 +134,14 @@ export async function reopenRoundAction(): Promise<{ ok: boolean; error?: string
 }
 
 // public: a participant confirms which finalists work for them
-export async function confirmAction(participantId: string, keys: string[]): Promise<{ ok: boolean; error?: string }> {
+export async function confirmAction(participantId: string, keys: string[], note = ""): Promise<{ ok: boolean; error?: string }> {
   if (!participantId) return { ok: false, error: "חסר מזהה" };
   const round = await getRound();
   if (round.status !== "open") return { ok: false, error: "סבב האישור אינו פתוח" };
   const valid = new Set(round.finalists.map((f) => finalistKey(f)));
   const filtered = keys.filter((k) => valid.has(k));
   try {
-    await upsertConfirmations(participantId, filtered);
+    await upsertConfirmations(participantId, filtered, note);
     return { ok: true };
   } catch (e) {
     return { ok: false, error: (e as Error).message };

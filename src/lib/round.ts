@@ -3,20 +3,33 @@ import { getServiceClient } from "./supabaseServer";
 import type { Finalist, MeetLocation, Round, RoundStatus } from "./types";
 export { optionKey, finalistKey } from "./roundView";
 
+const EMPTY_ROUND: Round = {
+  finalists: [], status: "idle", final: null, announcement: null, location: null, finalists_at: null,
+};
+
 export async function getRound(): Promise<Round> {
   const sb = getServiceClient();
-  const { data, error } = await sb
-    .from("safi_round")
+  // Resilient: full select first; if a column is missing (migration lag) retry
+  // without it; if anything still fails, return an idle round instead of crashing.
+  let data: Record<string, unknown> | null = null;
+  const full = await sb.from("safi_round")
     .select("finalists, status, final, announcement, location, finalists_at")
-    .eq("id", 1)
-    .maybeSingle();
-  if (error) throw error;
-  if (!data) return { finalists: [], status: "idle", final: null, announcement: null, location: null, finalists_at: null };
+    .eq("id", 1).maybeSingle();
+  if (full.error) {
+    const base = await sb.from("safi_round")
+      .select("finalists, status, final, announcement, location")
+      .eq("id", 1).maybeSingle();
+    if (base.error) return EMPTY_ROUND;
+    data = base.data as Record<string, unknown> | null;
+  } else {
+    data = full.data as Record<string, unknown> | null;
+  }
+  if (!data) return EMPTY_ROUND;
   return {
     finalists: Array.isArray(data.finalists) ? (data.finalists as Finalist[]) : [],
-    status: (data.status ?? "idle") as RoundStatus,
+    status: (data.status as RoundStatus) ?? "idle",
     final: (data.final as Finalist) ?? null,
-    announcement: data.announcement ?? null,
+    announcement: (data.announcement as string) ?? null,
     location: (data.location as MeetLocation) ?? null,
     finalists_at: (data.finalists_at as string) ?? null,
   };

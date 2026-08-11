@@ -47,11 +47,14 @@ export async function upsertResponse(
   if (error) throw error;
 }
 
-export async function upsertConfirmations(participantId: string, keys: string[]): Promise<void> {
+export async function upsertConfirmations(participantId: string, keys: string[], note = ""): Promise<void> {
   const sb = getServiceClient();
+  const existing = await getResponse(participantId);
+  const prefs = existing?.preferences ?? { activities: [] };
+  const nextPrefs = { ...prefs, confirmNote: note.trim() ? note.trim() : undefined };
   const { error } = await sb
     .from("safi_responses")
-    .upsert({ participant_id: participantId, confirmations: keys }, { onConflict: "participant_id" });
+    .upsert({ participant_id: participantId, confirmations: keys, preferences: nextPrefs }, { onConflict: "participant_id" });
   if (error) throw error;
 }
 

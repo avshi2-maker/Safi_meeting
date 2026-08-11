@@ -53,6 +53,13 @@ export default function PublicTally({ people, finalists, mode = "availability" }
               </div>
             )}
 
+            {p.prefs.confirmNote && (
+              <div className="person-line">
+                <span className="lbl">הערה על המועדים:</span>
+                <span className="tag yes">📝 {p.prefs.confirmNote}</span>
+              </div>
+            )}
+
             {p.dates.length > 0 && (
               <div className="person-dates">
                 {p.dates.map((d) => (

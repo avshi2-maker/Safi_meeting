@@ -15,6 +15,7 @@ export interface Preferences {
   activities: string[];
   freeIdea?: string;
   location?: string; // this person's suggestion for where to meet
+  confirmNote?: string; // free-text note on the proposed dates (confirm round)
 }
 
 export interface Participant {

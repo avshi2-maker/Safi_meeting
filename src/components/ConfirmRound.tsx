@@ -13,6 +13,7 @@ export default function ConfirmRound() {
   const [view, setView] = useState<RoundView | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [toggled, setToggled] = useState<string[]>([]);
+  const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
   const [pending, start] = useTransition();
 
@@ -35,7 +36,9 @@ export default function ConfirmRound() {
 
   function pickName(id: string) {
     setSelectedId(id); setSaved(false);
-    setToggled(view?.people.find((p) => p.id === id)?.confirmations ?? []);
+    const me = view?.people.find((p) => p.id === id);
+    setToggled(me?.confirmations ?? []);
+    setNote(me?.prefs.confirmNote ?? "");
   }
   function toggle(key: string) {
     setSaved(false);
@@ -43,7 +46,7 @@ export default function ConfirmRound() {
   }
   function save() {
     if (!selectedId) return;
-    start(async () => { const r = await confirmAction(selectedId, toggled); if (r.ok) { setSaved(true); pull(); } });
+    start(async () => { const r = await confirmAction(selectedId, toggled, note); if (r.ok) { setSaved(true); pull(); } });
   }
 
   if (!view) return <main className="wrap"><BackButton /><div className="card">טוען…</div></main>;
@@ -99,7 +102,11 @@ export default function ConfirmRound() {
           </div>
         ) : (
           <div style={{ marginTop: 14 }}>
-            <button className="btn-save" onClick={save} disabled={pending}>
+            <div className="label">הערה על המועדים המוצעים (לא חובה)</div>
+            <textarea className="input" value={note} rows={2}
+              placeholder="לדוגמה: 25/09 עדיף אחרי 19:00, ה-3/10 פחות נוח…"
+              onChange={(e) => { setNote(e.target.value); setSaved(false); }} />
+            <button className="btn-save" style={{ marginTop: 10 }} onClick={save} disabled={pending}>
               {pending ? "שומר…" : saved ? "✓ נשמר!" : `שמירת האישור של ${me?.name}`}
             </button>
             <button className="btn btn-ghost btn-block" style={{ marginTop: 8 }} onClick={() => setSelectedId(null)}>החלפת שם</button>
