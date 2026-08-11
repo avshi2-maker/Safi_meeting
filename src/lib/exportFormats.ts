@@ -1,4 +1,6 @@
-// exportFormats.ts (src/lib/exportFormats.ts) · updated 08.08.2026 09:30 (Asia/Jerusalem)
+// exportFormats.ts (src/lib/exportFormats.ts) · updated 11.08.2026 12:05 (Asia/Jerusalem)
+// Removed dead buildConfirmInvite() — the confirm-round invite is now built inline
+// in ClosingRound.tsx (flower wording); this function was unused and held stale text.
 import type { Finalist, MeetLocation, SuggestionOption } from "./types";
 import { SITE_URL } from "./site";
 
@@ -26,16 +28,6 @@ export function buildShareText(
 
 export function buildSubject(): string {
   return "תיאום מפגש משפחתי — הצעות מועד";
-}
-
-export function buildConfirmInvite(origin: string): string {
-  return [
-    "משפחה יקרה 💛",
-    "פתחנו סבב אישור למועד המפגש.",
-    "כנסו, בחרו את השם שלכם וסמנו ✓ מה שמתאים לכם:",
-    `${origin}/confirm`,
-    "אפשר גם לראות מה כולם בחרו. תודה!",
-  ].join("\n");
 }
 
 export function buildAnnounce(
