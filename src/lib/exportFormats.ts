@@ -1,6 +1,7 @@
-// exportFormats.ts (src/lib/exportFormats.ts) · updated 11.08.2026 12:05 (Asia/Jerusalem)
-// Removed dead buildConfirmInvite() — the confirm-round invite is now built inline
-// in ClosingRound.tsx (flower wording); this function was unused and held stale text.
+// exportFormats.ts (src/lib/exportFormats.ts) · updated 11.08.2026 11:58 (Asia/Jerusalem)
+// buildConfirmInvite() is the SINGLE source of the phase-2 confirm message (flower
+// wording + /confirm link). Both the organizer top share button (OrganizerDashboard)
+// and the closing-round share button (ClosingRound) call it, so they can never drift.
 import type { Finalist, MeetLocation, SuggestionOption } from "./types";
 import { SITE_URL } from "./site";
 
@@ -28,6 +29,19 @@ export function buildShareText(
 
 export function buildSubject(): string {
   return "תיאום מפגש משפחתי — הצעות מועד";
+}
+
+// Phase-2 confirm invite (the AI already collected everyone's dates; now the family
+// approves the proposed date). Sent by BOTH share buttons — single source of truth.
+export function buildConfirmInvite(origin: string): string {
+  return [
+    "שלום למשפחה 🌸",
+    "קיבלנו מכולם מועדים מועדפים למפגש 🌷",
+    "בלחיצה אחת אפשר לאשר את המועד שמתאים לכם, וגם לראות מה כולם בחרו — הכל במקום אחד.",
+    "לחצו, בחרו את השם שלכם וסמנו:",
+    `${origin}/confirm`,
+    "(30 שניות, ואפשר לשנות בכל רגע) 🌼",
+  ].join("\n");
 }
 
 export function buildAnnounce(

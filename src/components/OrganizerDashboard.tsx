@@ -1,5 +1,7 @@
 "use client";
-// OrganizerDashboard.tsx (src/components/OrganizerDashboard.tsx) · updated 07.08.2026 12:10 (Asia/Jerusalem)
+// OrganizerDashboard.tsx (src/components/OrganizerDashboard.tsx) · updated 11.08.2026 11:58 (Asia/Jerusalem)
+// Top share button now sends the phase-2 CONFIRM message (AI proposal + /confirm link),
+// not the old phase-1 "come submit dates" invite. Uses shared buildConfirmInvite().
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { logoutOrganizerAction } from "@/app/actions";
@@ -15,6 +17,7 @@ import ClosingRound from "./ClosingRound";
 import AiHint from "./AiHint";
 import Teleprompter from "./Teleprompter";
 import { SITE_URL } from "@/lib/site";
+import { buildConfirmInvite } from "@/lib/exportFormats";
 
 interface RespItem {
   participant_id: string;
@@ -87,10 +90,9 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
     }
   }
 
-  async function shareInvite() {
-    const origin = SITE_URL;
-    const text = `שלום לכולם 💛\nמתאמים מפגש משפחתי (ספטמבר–נובמבר).\nכנסו לקישור, בחרו את השם שלכם וסמנו מתי נוח לכם:\n${origin}/\nתודה!`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  function shareInvite() {
+    // Phase-2: send the AI-proposal confirm message (+ /confirm link), not the old invite.
+    window.open(`https://wa.me/?text=${encodeURIComponent(buildConfirmInvite(SITE_URL))}`, "_blank");
   }
 
   async function logout() {
@@ -107,7 +109,7 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
       </div>
 
       <div className="row">
-        <button className="btn btn-green" onClick={shareInvite}>🟢 שליחת קישור לקבוצה</button>
+        <button className="btn btn-green" onClick={shareInvite}>🟢 שליחת הצעת המועד לאישור</button>
         <div className="spacer" />
         <button className="btn btn-ghost" onClick={logout}>יציאה</button>
       </div>

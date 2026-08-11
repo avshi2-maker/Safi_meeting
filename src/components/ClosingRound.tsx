@@ -1,5 +1,6 @@
 "use client";
-// ClosingRound.tsx (src/components/ClosingRound.tsx) · updated 08.08.2026 08:30 (Asia/Jerusalem)
+// ClosingRound.tsx (src/components/ClosingRound.tsx) · updated 11.08.2026 11:58 (Asia/Jerusalem)
+// Confirm-share button now calls the shared buildConfirmInvite() (single source of truth).
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { publishFinalistsAction, lockFinalAction, reopenRoundAction } from "@/app/actions";
 import { finalistKey } from "@/lib/roundView";
@@ -8,6 +9,7 @@ import FinalistBar from "./FinalistBar";
 import PublicTally from "./PublicTally";
 import LocationEditor from "./LocationEditor";
 import { SITE_URL } from "@/lib/site";
+import { buildConfirmInvite } from "@/lib/exportFormats";
 
 type ActionResult = { ok: boolean; error?: string };
 
@@ -42,8 +44,7 @@ export default function ClosingRound({ hasOptions }: { hasOptions: boolean }) {
     });
   }
   function shareInvite() {
-    const t = `שלום למשפחה 🌸\nקיבלנו מכולם מועדים מועדפים למפגש 🌷\nבלחיצה אחת אפשר לאשר את המועד שמתאים לכם, וגם לראות מה כולם בחרו — הכל במקום אחד.\nלחצו, בחרו את השם שלכם וסמנו:\n${SITE_URL}/confirm\n(30 שניות, ואפשר לשנות בכל רגע) 🌼`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(t)}`, "_blank");
+    window.open(`https://wa.me/?text=${encodeURIComponent(buildConfirmInvite(SITE_URL))}`, "_blank");
   }
   function shareAnnounce() {
     if (view?.round.announcement) window.open(`https://wa.me/?text=${encodeURIComponent(view.round.announcement)}`, "_blank");
