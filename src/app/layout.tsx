@@ -1,10 +1,10 @@
-// layout.tsx (src/app/layout.tsx) · updated 07.08.2026 20:20 (Asia/Jerusalem)
+// layout.tsx (src/app/layout.tsx) · updated 11.08.2026 12:20 (Asia/Jerusalem)
+// Link preview: bold header only, no description line.
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Safi · תיאום מפגש משפחתי",
-  description: "בוחרים תאריכים שמתאימים לכם, וה-AI מציע את המועד הכי מסונכרן.",
+  title: "תיאום מפגש משפחתי קרול-ביטי",
 };
 
 export const viewport: Viewport = {
