@@ -42,7 +42,7 @@ export default function ClosingRound({ hasOptions }: { hasOptions: boolean }) {
     });
   }
   function shareInvite() {
-    const t = `משפחה יקרה 💛\nפתחנו סבב אישור למפגש 🎉\nבלחיצה אחת אתם גם מאשרים מה שמתאים לכם, וגם רואים בשקיפות מה כל אחד בחר ואישר — הכל במקום אחד.\n👇 לחצו, בחרו את השם שלכם, וסמנו ✓\n${SITE_URL}/confirm\n(30 שניות, ואפשר לשנות בכל רגע)`;
+    const t = `שלום למשפחה 🌸\nקיבלנו מכולם מועדים מועדפים למפגש 🌷\nבלחיצה אחת אפשר לאשר את המועד שמתאים לכם, וגם לראות מה כולם בחרו — הכל במקום אחד.\nלחצו, בחרו את השם שלכם וסמנו:\n${SITE_URL}/confirm\n(30 שניות, ואפשר לשנות בכל רגע) 🌼`;
     window.open(`https://wa.me/?text=${encodeURIComponent(t)}`, "_blank");
   }
   function shareAnnounce() {
