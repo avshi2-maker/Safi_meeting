@@ -39,7 +39,9 @@ export function buildConfirmInvite(origin: string): string {
     "קיבלנו מכולם מועדים מועדפים למפגש.",
     "בלחיצה אחת אפשר לאשר את המועד שמתאים לכם, וגם לראות מה כולם בחרו — הכל במקום אחד.",
     "לחצו, בחרו את השם שלכם וסמנו:",
-    `${origin}/confirm`,
+    // ?v=2 = a "fresh" URL so WhatsApp re-crawls the link preview instead of showing
+    // its old cached card. The page ignores the param; only the preview cache cares.
+    `${origin}/confirm?v=2`,
     "(30 שניות, ואפשר לשנות בכל רגע)",
   ].join("\n");
 }
