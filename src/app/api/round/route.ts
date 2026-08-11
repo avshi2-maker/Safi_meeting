@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
+  try {
   const [participants, responses, round] = await Promise.all([
     getParticipants(),
     getAllResponses(),
@@ -59,4 +60,11 @@ export async function GET(req: Request) {
   }
 
   return NextResponse.json({ round, total: participants.length, people, counts, stale });
+  } catch (e) {
+    console.error("round error:", (e as Error).message);
+    return NextResponse.json({
+      round: { finalists: [], status: "idle", final: null, announcement: null, location: null, finalists_at: null },
+      total: 0, people: [], counts: {}, stale: false,
+    });
+  }
 }
