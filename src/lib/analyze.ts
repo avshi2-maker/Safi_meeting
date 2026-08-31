@@ -9,6 +9,8 @@ import type {
 import { SLOTS, SLOT_MAP } from "./slots";
 import { fullLabelHe } from "./dates";
 import { tallyPrefs } from "./prefs";
+import { holidayPromptBlock } from "./holidays";
+import { REQUIRED_ATTENDEE, MEETING_PLACE } from "./meeting";
 
 export interface Candidate {
   date: string;
@@ -180,11 +182,16 @@ export function fallbackOptions(
 }
 
 export function buildSystemPrompt(): string {
+  const requiredLine = REQUIRED_ATTENDEE
+    ? `המפגש ייערך ${MEETING_PLACE} — לכן חובה ש${REQUIRED_ATTENDEE} תהיה מבין הזמינים בכל מועד שאתה מציע. אל תציע אף מועד ש${REQUIRED_ATTENDEE} אינה פנויה בו.`
+    : "";
   return [
-    "אתה עוזר לתאם מפגש משפחתי אחד בין כל המשתתפים, בין 1.9.2026 ל-30.11.2026.",
-    "מטרתך: לבחור עד 3 מועדים (תאריך + חלק-יום) שממקסמים את מספר המשתתפים הזמינים.",
+    "אתה עוזר לתאם מפגש משפחתי אחד בין כל המשתתפים, בין 1.9.2026 ל-31.12.2026.",
+    ...(requiredLine ? [requiredLine] : []),
+    "מטרתך: לבחור עד 3 מועדים (תאריך + חלק-יום) שממקסמים את מספר המשתתפים הזמינים, מבין המועדים המותרים.",
     "העדף 3 תאריכים שונים — אל תציע את אותו יום פעמיים אלא אם אין מספיק ימים חופפים.",
     "בחר אך ורק מתוך רשימת המועדים המועמדים שסופקה.",
+    "חלק מהתאריכים הם חגים יהודיים (מצורפת רשימה). מותר להציע מועד בחג, אך אם מועד מוצע נופל על חג — ציין זאת במפורש בשדה reason_he כדי שהמשפחה תהיה מודעת.",
     "התחשב בהערות לכל תאריך ובהערות הכלליות (למשל 'רק בערב', 'בחו״ל', 'אחרי 19:00').",
     "החזר JSON תקין בלבד, ללא טקסט נוסף וללא סימוני קוד, במבנה:",
     '{"options":[{"date":"YYYY-MM-DD","slot":"morning|noon|afternoon|evening","reason_he":"משפט אחד בעברית שמתייחס גם להערות הרלוונטיות","maybe":["שם"]}]}',
@@ -212,6 +219,9 @@ export function buildUserPrompt(
     "",
     "מועדים מועמדים (ממויינים לפי מספר זמינים):",
     buildCandidateBlock(cands),
+    "",
+    "חגים בתקופה (לידיעה — אם מועד מוצע נופל על אחד מאלה, ציין זאת ב-reason_he):",
+    holidayPromptBlock(),
     "",
     "בחר את 3 המועדים הטובים ביותר, תוך התחשבות בהערות, והחזר JSON כפי שהוגדר.",
   ].join("\n");

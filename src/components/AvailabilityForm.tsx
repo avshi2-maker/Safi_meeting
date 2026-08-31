@@ -9,6 +9,7 @@ import type { Availability, Preferences, SlotKey } from "@/lib/types";
 import MonthCalendar from "./MonthCalendar";
 import BackButton from "./BackButton";
 import PreferencesSelector from "./PreferencesSelector";
+import HolidayLegend from "./HolidayLegend";
 
 const ALL_SLOTS: SlotKey[] = SLOTS.map((s) => s.key);
 
@@ -101,6 +102,8 @@ export default function AvailabilityForm({ participant, existing }: Props) {
                 selected={selected} onToggle={toggleDate} />
             ))}
           </div>
+
+          <HolidayLegend />
 
           {totalPicked > 0 && (
             <div className="card">

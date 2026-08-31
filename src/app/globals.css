@@ -449,3 +449,36 @@ textarea.input { resize: vertical; min-height: 64px; }
 
 /* --- v21: red phase-2 confirm CTA --- */
 .confirm-cta { color: #c0392b; font-weight: 800; font-size: 16px; margin-top: 4px; }
+
+/* --- v25 (31.08.2026): holidays on calendar + legend + new-round reset --- */
+/* holiday day cells: keep the number on top, tiny holiday label under it */
+.cal-cell { flex-direction: column; gap: 1px; padding: 2px; overflow: hidden; }
+.cc-day { line-height: 1; }
+.cc-hol {
+  font-size: 8px; line-height: 1.05; font-weight: 700; color: #b5651d;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cal-cell.holiday { background: #fff7ed; border-color: #f2cc8f; }
+.cal-cell.holiday:hover { border-color: var(--accent); }
+.cal-cell.sel .cc-day { color: #fff; }
+.cal-cell.sel .cc-hol { color: rgba(255,255,255,.92); }
+
+/* holiday marks on the organizer heatmap */
+.heat-cell.holiday { box-shadow: inset 0 0 0 1.5px #f2cc8f; }
+.hc-hol {
+  font-size: 7.5px; line-height: 1; font-weight: 700; color: #b5651d;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* "חגים בתקופה" legend card */
+.holiday-card .hol-legend {
+  list-style: none; margin: 8px 0 0; padding: 0;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px;
+}
+.holiday-card .hol-legend li { display: flex; gap: 8px; font-size: 13px; align-items: baseline; }
+.holiday-card .hl-span { font-weight: 800; color: var(--green-d); min-width: 66px; }
+.holiday-card .hl-name { color: var(--ink); }
+@media (max-width: 640px) { .holiday-card .hol-legend { grid-template-columns: 1fr; } }
+
+/* new-round reset card */
+.reset-card { border: 1.5px dashed #e0b4b4; }

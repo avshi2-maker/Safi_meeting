@@ -16,6 +16,7 @@ import {
 } from "@/lib/analyze";
 import { costUsd } from "@/lib/pricing";
 import { insertSuggestion } from "@/lib/suggestions";
+import { REQUIRED_ATTENDEE } from "@/lib/meeting";
 import type { AnalyzeResult } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -50,8 +51,20 @@ export async function POST() {
   const total = participants.length;
   const responded = responses.length;
 
-  const cands = computeCandidates(responses);
+  const allCands = computeCandidates(responses);
   const remarks = remarksByDate(responses);
+
+  // Hard constraint: the meeting is hosted at REQUIRED_ATTENDEE's home, so every
+  // proposed date must be one she is available on. Only enforce once she has
+  // actually submitted availability (otherwise there is nothing to filter on).
+  const requiredResponded =
+    !!REQUIRED_ATTENDEE &&
+    responses.some(
+      (r) => r.name === REQUIRED_ATTENDEE && Object.keys(r.availability || {}).length > 0,
+    );
+  const cands = requiredResponded
+    ? allCands.filter((c) => c.available.includes(REQUIRED_ATTENDEE))
+    : allCands;
 
   if (cands.length === 0) {
     const empty: AnalyzeResult = {

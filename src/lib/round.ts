@@ -55,6 +55,14 @@ export async function reopenRound(): Promise<void> {
 export async function setLocation(location: MeetLocation | null): Promise<void> {
   await patchRound({ location });
 }
+// Start a fresh round: clear finalists, final pick, announcement and location,
+// and return to idle. (Participant names live in safi_participants and are kept.)
+export async function resetRound(): Promise<void> {
+  await patchRound({
+    finalists: [], status: "idle", final: null,
+    announcement: null, location: null, finalists_at: null,
+  });
+}
 
 export async function getLastNotified(): Promise<string | null> {
   const sb = getServiceClient();

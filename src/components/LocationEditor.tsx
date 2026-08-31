@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { saveLocationAction, clearLocationAction } from "@/app/actions";
 import { buildWazeLink } from "@/lib/exportFormats";
+import { MEETING_PLACE } from "@/lib/meeting";
 import type { MeetLocation } from "@/lib/types";
 import AiHint from "./AiHint";
 import ApiCostMeter, { MeterState } from "./ApiCostMeter";
@@ -13,13 +14,15 @@ export default function LocationEditor({
   location, onSaved,
 }: { location: MeetLocation | null; onSaved: () => void }) {
   const [text, setText] = useState("");
-  const [place, setPlace] = useState(location?.place ?? "");
+  // Location is fixed to Tali's house this round — prefill it so the organizer
+  // only needs to paste the exact address / Waze link and save.
+  const [place, setPlace] = useState(location?.place || MEETING_PLACE);
   const [address, setAddress] = useState(location?.address ?? "");
   const [waze, setWaze] = useState(location?.waze ?? "");
   const [reason, setReason] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [meter, setMeter] = useState<MeterState>({ state: "idle" });
-  const [cleaned, setCleaned] = useState(!!location);
+  const [cleaned, setCleaned] = useState(true);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
   const [pending, start] = useTransition();

@@ -58,6 +58,14 @@ export async function upsertConfirmations(participantId: string, keys: string[],
   if (error) throw error;
 }
 
+// Wipe every submitted response (availability, preferences, confirmations) so a
+// new round starts clean. Names in safi_participants are untouched.
+export async function clearAllResponses(): Promise<void> {
+  const sb = getServiceClient();
+  const { error } = await sb.from("safi_responses").delete().not("participant_id", "is", null);
+  if (error) throw error;
+}
+
 export async function getAllResponses(): Promise<ResponseWithName[]> {
   const sb = getServiceClient();
   const { data, error } = await sb

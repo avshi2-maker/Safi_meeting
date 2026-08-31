@@ -4,11 +4,12 @@
 // not the old phase-1 "come submit dates" invite. Uses shared buildConfirmInvite().
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { logoutOrganizerAction } from "@/app/actions";
+import { logoutOrganizerAction, resetForNewRoundAction } from "@/app/actions";
 import type { Availability, SuggestionOption } from "@/lib/types";
 import type { PrefsTally } from "@/lib/prefs";
 import ResponseTracker from "./ResponseTracker";
 import HeatmapCalendar from "./HeatmapCalendar";
+import HolidayLegend from "./HolidayLegend";
 import SuggestionCard from "./SuggestionCard";
 import ExportBar from "./ExportBar";
 import ApiCostMeter, { MeterState } from "./ApiCostMeter";
@@ -67,6 +68,31 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
   const [meter, setMeter] = useState<MeterState>(initialMeter);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [resetErr, setResetErr] = useState("");
+
+  async function doReset() {
+    setResetErr("");
+    setResetting(true);
+    try {
+      const r = await resetForNewRoundAction();
+      if (!r.ok) {
+        setResetErr(r.error === "unauthorized" ? "אין הרשאה — התחברו מחדש" : r.error || "האיפוס נכשל");
+        setResetting(false);
+        return;
+      }
+      setOptions([]);
+      setMeter({ state: "idle" });
+      setConfirmReset(false);
+      setResetting(false);
+      router.refresh();
+    } catch (e) {
+      setResetErr((e as Error).message);
+      setResetting(false);
+    }
+  }
+
   async function analyze() {
     const startedAt = Date.now();
     setMeter({ state: "running", elapsedMs: 0 });
@@ -118,6 +144,7 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
 
       <ResponseTracker participants={participants} respondedIds={respondedIds} />
       <HeatmapCalendar counts={counts} total={total} />
+      <HolidayLegend />
 
       <div className="card">
         <h2>העדפות המשפחה</h2>
@@ -163,6 +190,24 @@ export default function OrganizerDashboard({ participants, responses, latest, pr
       </div>
 
       <ClosingRound hasOptions={options.length > 0} />
+
+      <div className="card reset-card">
+        <h2>התחלת סבב חדש</h2>
+        <p className="subtle">
+          מנקה את כל התאריכים, האישורים וההצעות מהסבב הקודם — ומשאיר את רשימת השמות. אחרי האיפוס המשפחה ממלאה זמינות מחדש.
+        </p>
+        {resetErr && <div className="err">{resetErr}</div>}
+        {!confirmReset ? (
+          <button className="btn btn-ghost" onClick={() => setConfirmReset(true)}>🔄 התחלת סבב חדש (איפוס)</button>
+        ) : (
+          <div className="row" style={{ marginTop: 6 }}>
+            <button className="btn-lock" onClick={doReset} disabled={resetting}>
+              {resetting ? "מאפס…" : "כן, לאפס הכול"}
+            </button>
+            <button className="btn btn-ghost" onClick={() => setConfirmReset(false)} disabled={resetting}>ביטול</button>
+          </div>
+        )}
+      </div>
     </main>
   );
 }

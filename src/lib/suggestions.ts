@@ -37,6 +37,13 @@ export async function insertSuggestion(s: {
   if (error) throw error;
 }
 
+// Remove stored AI suggestions so the organizer dashboard starts empty next round.
+export async function clearSuggestions(): Promise<void> {
+  const sb = getServiceClient();
+  const { error } = await sb.from("safi_suggestions").delete().not("id", "is", null);
+  if (error) throw error;
+}
+
 export async function getLatestSuggestion(): Promise<StoredSuggestion | null> {
   const sb = getServiceClient();
   const { data, error } = await sb

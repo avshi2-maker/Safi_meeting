@@ -3,13 +3,15 @@ import type { SlotKey } from "./types";
 import { SLOT_MAP } from "./slots";
 
 export const WINDOW_START = "2026-09-01";
-export const WINDOW_END = "2026-11-30";
+// Extended to end of December 2026 so Chanukah (4–12 Dec) is selectable.
+export const WINDOW_END = "2026-12-31";
 
-// Months shown (0-based): Sep, Oct, Nov 2026
+// Months shown (0-based): Sep, Oct, Nov, Dec 2026
 export const WINDOW_MONTHS: { year: number; month: number }[] = [
   { year: 2026, month: 8 },
   { year: 2026, month: 9 },
   { year: 2026, month: 10 },
+  { year: 2026, month: 11 },
 ];
 
 export const MONTHS_HE = [

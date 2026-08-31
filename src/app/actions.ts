@@ -68,10 +68,27 @@ export async function isOrganizer(): Promise<boolean> {
 }
 
 // --- confirmation round actions ---
-import { getLatestSuggestion } from "@/lib/suggestions";
-import { upsertConfirmations, getAllResponses } from "@/lib/responses";
-import { publishFinalists, setFinal, reopenRound, getRound, setLocation, finalistKey } from "@/lib/round";
+import { getLatestSuggestion, clearSuggestions } from "@/lib/suggestions";
+import { upsertConfirmations, getAllResponses, clearAllResponses } from "@/lib/responses";
+import { publishFinalists, setFinal, reopenRound, getRound, setLocation, resetRound, finalistKey } from "@/lib/round";
 import type { Finalist, MeetLocation } from "@/lib/types";
+
+// Organizer-only: start a completely fresh round. Clears everyone's date
+// answers, confirmations and the stored AI suggestions, and resets the round to
+// idle — while KEEPING the family names. The family then re-submits availability.
+export async function resetForNewRoundAction(): Promise<{ ok: boolean; error?: string }> {
+  if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
+  try {
+    await clearAllResponses();
+    await clearSuggestions();
+    await resetRound();
+    revalidatePath("/");
+    revalidatePath("/organizer");
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
 
 export async function publishFinalistsAction(): Promise<{ ok: boolean; error?: string; count?: number }> {
   if (!(await isOrganizer())) return { ok: false, error: "unauthorized" };
