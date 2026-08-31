@@ -183,7 +183,7 @@ export function fallbackOptions(
 
 export function buildSystemPrompt(): string {
   const requiredLine = REQUIRED_ATTENDEE
-    ? `המפגש ייערך ${MEETING_PLACE} — לכן חובה ש${REQUIRED_ATTENDEE} תהיה מבין הזמינים בכל מועד שאתה מציע. אל תציע אף מועד ש${REQUIRED_ATTENDEE} אינה פנויה בו.`
+    ? `המפגש ייערך ב${MEETING_PLACE} — לכן חובה ש${REQUIRED_ATTENDEE} תהיה מבין הזמינים בכל מועד שאתה מציע. אל תציע אף מועד ש${REQUIRED_ATTENDEE} אינה פנויה בו.`
     : "";
   return [
     "אתה עוזר לתאם מפגש משפחתי אחד בין כל המשתתפים, בין 1.9.2026 ל-31.12.2026.",

@@ -2,10 +2,14 @@
 import type { Preferences, ResponseWithName } from "./types";
 
 export const ACTIVITIES: { key: string; he: string }[] = [
+  { key: "family_meal", he: "מפגש משפחתי וארוחה משותפת" },
   { key: "restaurant", he: "מסעדה" },
   { key: "trip", he: "טיול" },
   { key: "beach", he: "פיקניק בחוף הים" },
 ];
+
+// Pre-selected activity for a new response (shown in red in the selector).
+export const DEFAULT_ACTIVITY = "family_meal";
 
 export const ACTIVITY_HE: Record<string, string> = ACTIVITIES.reduce(
   (a, x) => ((a[x.key] = x.he), a),

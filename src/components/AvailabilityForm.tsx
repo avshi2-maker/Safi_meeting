@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { SLOTS } from "@/lib/slots";
 import { WINDOW_MONTHS, shortLabelHe } from "@/lib/dates";
 import { saveAvailabilityAction } from "@/app/actions";
+import { DEFAULT_ACTIVITY } from "@/lib/prefs";
+import { MEETING_PLACE } from "@/lib/meeting";
 import type { Availability, Preferences, SlotKey } from "@/lib/types";
 import MonthCalendar from "./MonthCalendar";
 import BackButton from "./BackButton";
@@ -12,6 +14,9 @@ import PreferencesSelector from "./PreferencesSelector";
 import HolidayLegend from "./HolidayLegend";
 
 const ALL_SLOTS: SlotKey[] = SLOTS.map((s) => s.key);
+// New responses start with the family-meal activity selected and Tali's house
+// as the suggested location.
+const DEFAULT_PREFS: Preferences = { activities: [DEFAULT_ACTIVITY], location: MEETING_PLACE };
 
 function hm(iso: string): string {
   if (!iso) return "";
@@ -25,7 +30,7 @@ interface Props {
 
 export default function AvailabilityForm({ participant, existing }: Props) {
   const [av, setAv] = useState<Availability>(existing?.availability ?? {});
-  const [prefs, setPrefs] = useState<Preferences>(existing?.preferences ?? { activities: [] });
+  const [prefs, setPrefs] = useState<Preferences>(existing?.preferences ?? DEFAULT_PREFS);
   const [note, setNote] = useState(existing?.note ?? "");
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
@@ -89,6 +94,11 @@ export default function AvailabilityForm({ participant, existing }: Props) {
         <div className="kick">שלום {participant.name} 👋</div>
         <h1>מתי נוח לכם להיפגש?</h1>
         <p className="subtle">לחצו על תאריכים (יום שלם — אפשר לצמצם לחלקי-יום ולהוסיף הערה לכל תאריך).</p>
+      </div>
+
+      <div className="header-notes">
+        <div className="hn-cal">מועדי החגים והחופשות מוצגים בלוח השנה</div>
+        <div className="hn-place">המפגש ייערך אצל טלי ברמת השרון</div>
       </div>
 
       <div className="card photo-card mobile-only"><img src="/safi_4helmets.png" alt="ספי" /></div>

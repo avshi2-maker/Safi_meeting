@@ -1,7 +1,7 @@
 "use client";
 // PreferencesSelector.tsx (src/components/PreferencesSelector.tsx) · updated 07.08.2026 19:30 (Asia/Jerusalem)
 import { useState } from "react";
-import { ACTIVITIES } from "@/lib/prefs";
+import { ACTIVITIES, DEFAULT_ACTIVITY } from "@/lib/prefs";
 import type { Preferences } from "@/lib/types";
 
 interface Props { value: Preferences; onChange: (p: Preferences) => void; }
@@ -9,6 +9,7 @@ interface Props { value: Preferences; onChange: (p: Preferences) => void; }
 export default function PreferencesSelector({ value, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const activities = value.activities ?? [];
+  const hasDefault = activities.includes(DEFAULT_ACTIVITY);
 
   function toggle(key: string) {
     const has = activities.includes(key);
@@ -22,14 +23,14 @@ export default function PreferencesSelector({ value, onChange }: Props) {
   return (
     <div className="prefs">
       <button className="prefs-toggle" onClick={() => setOpen((o) => !o)}>
-        <span>העדפות: {summary}</span>
+        <span className={hasDefault ? "prefs-summary-default" : undefined}>העדפות: {summary}</span>
         <span>{open ? "▲" : "▼"}</span>
       </button>
       {open && (
         <div className="prefs-panel">
           {ACTIVITIES.map((a) => {
             const on = activities.includes(a.key);
-            const cls = "chip" + (on ? " on" : "");
+            const cls = "chip" + (on ? " on" : "") + (a.key === DEFAULT_ACTIVITY ? " pref-family" : "");
             return (
               <button key={a.key} className={cls} onClick={() => toggle(a.key)}>{on ? "✓ " : ""}{a.he}</button>
             );

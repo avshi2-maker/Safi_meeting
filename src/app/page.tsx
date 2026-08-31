@@ -27,6 +27,10 @@ export default async function Home() {
         </a>
         <div className="home-banner-title">🗓️ מתאמים מפגש משפחתי</div>
         <div className="home-banner-sub">ספטמבר–דצמבר 2026 · בוחרים יחד תאריך שמתאים לכולם</div>
+        <div className="home-notes">
+          <div className="hn-cal">מועדי החגים והחופשות מוצגים בלוח השנה</div>
+          <div className="hn-place">המפגש ייערך אצל טלי ברמת השרון</div>
+        </div>
       </div>
 
       <Clock />
